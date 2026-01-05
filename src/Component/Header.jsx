@@ -5,7 +5,6 @@ import { setMode } from "../Feature/TheamMode";
 import { Link as RouteLink, NavLink as RouteNavLink, useLocation } from "react-router";
 import { Link as ScroolLink, scroller } from "react-scroll";
 import Logout from "./Logout";
-import Logo from "/Logo/main.svg?react";
 
 
 const Header = () => {
@@ -84,19 +83,19 @@ const Header = () => {
             {location.pathname == "/" ?
               (
                 <ScroolLink className="flex items-center cursor-pointer" to="Hero" smooth={true} duration={500} onClick={() => handelActive("Home")}>
-                  <img src="/Logo/main.svg?react" alt="Logo" width="150" height="100" />
-                  
+                  {theam ? 
+                  <img src="/Logo/Darklogo.png" alt="Logo" width="150" height="100" />
+                  :
+                  <img src="/Logo/lightlogo.png" alt="Logo" width="150" height="100" />
+                  }
                 </ScroolLink>
               ) : (
                 <RouteLink onClick={() => (setMobileMenuOpen(false))} className="flex items-center cursor-pointer" to="/dashboard">
-                  <img
-                    src="/Logo/main.png"
-                    className="mr-3 h-6 sm:h-9"
-                    alt="Logo"
-                  />
-                  <span className="text-blackself-center text-xl font-semibold whitespace-nowrap dark:text-white">
-                    Quick Post
-                  </span>
+                  {theam ? 
+                  <img src="/Logo/Darklogo.png" alt="Logo" width="150" height="100" />
+                  :
+                  <img src="/Logo/lightlogo.png" alt="Logo" width="150" height="100" />
+                  }
                 </RouteLink>
               )
             }
