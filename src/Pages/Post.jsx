@@ -118,6 +118,7 @@ function Post({ type = "all" }) {
                                             postType="Draft"
                                             imageLink={post.fetureimage}
                                             title={post.titles}
+                                            authorName={post.name}
                                             updatedAt={post.$updatedAt}
                                             shortDescription={post.shortDescription}
                                             delet={() => onDelete(id, post.status, post.visibility)}
@@ -134,6 +135,7 @@ function Post({ type = "all" }) {
                                             postType={post.visibility}
                                             imageLink={post.fetureimage}
                                             title={post.titles}
+                                            authorName={post.name}
                                             updatedAt={post.$updatedAt}
                                             shortDescription={post.shortDescription}
                                             delet={() => onDelete(id, post.status, post.visibility)}

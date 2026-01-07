@@ -32,7 +32,7 @@ export class AuthService {
 
     }
     async createAccount({ email, password, name }) {
-        console.log("📤 Form Auth Input:", email, password, name);
+        console.log("Form Auth Input:", email, password, name);
 
         try {
             const userID = ID.unique();

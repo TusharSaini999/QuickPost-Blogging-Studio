@@ -2,14 +2,15 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 function Card({
-    postType = "Public", 
+    postType = "Public",
     imageLink = "https://picsum.photos/400/250",
     title = "Untitled Post",
+    authorName = "Unknown Author",
     updatedAt = "2025-09-03T14:45:00",
     shortDescription = "This is the short description of the post. It should look clean, subtle, and not overpower the title.",
-    delet=()=>{console.log("You Click The Delete")},
-    onClick=()=>{console.log("You Click The Card")},
-    onEdit=()=>{console.log("Edit")}
+    delet = () => { console.log("You Click The Delete") },
+    onClick = () => { console.log("You Click The Card") },
+    onEdit = () => { console.log("Edit") }
 }) {
     const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
 
@@ -56,7 +57,7 @@ function Card({
         >
             {/* Image Header */}
             <div className="relative">
-                <img src={imageLink} alt={title} onClick={onClick} className="w-full h-40 object-cover" />
+                <img src={imageLink} alt={title} onClick={onClick} className="w-full h-55 object-cover" />
                 <div className="absolute top-2 right-2 flex gap-2">
                     <button
                         className="p-2 bg-gray-800/70 hover:bg-gray-900 text-white rounded-full transition-transform transform hover:scale-110 shadow-md"
@@ -65,7 +66,7 @@ function Card({
                         <Pencil className="w-4 h-4" />
                     </button>
                     <button
-                    onClick={delet}
+                        onClick={delet}
                         className="p-2 bg-red-600/80 hover:bg-red-700 text-white rounded-full transition-transform transform hover:scale-110 shadow-md"
                     >
                         <Trash2 className="w-4 h-4" />
@@ -84,13 +85,23 @@ function Card({
                 <p className="mb-3 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                     {shortDescription}
                 </p>
+                <div className="mb-3 flex items-center justify-between">
+                    {/* Author */}
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                        By{" "}
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                            {authorName || "Author Name"}
+                        </span>
+                    </p>
 
-                {/* Badge */}
-                <span
-                    className={`inline-block mb-3 px-2 py-1 text-xs font-semibold rounded-md ${badgeStyles[postType]}`}
-                >
-                    {postType} 
-                </span>
+                    {/* Badge */}
+                    <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-md ${badgeStyles[postType]}`}
+                    >
+                        {postType}
+                    </span>
+                </div>
+
             </div>
 
             {/* Footer */}

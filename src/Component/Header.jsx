@@ -83,19 +83,19 @@ const Header = () => {
             {location.pathname == "/" ?
               (
                 <ScroolLink className="flex items-center cursor-pointer" to="Hero" smooth={true} duration={500} onClick={() => handelActive("Home")}>
-                  {theam ? 
-                  <img src="/Logo/Darklogo.png" alt="Logo" width="150" height="100" />
-                  :
-                  <img src="/Logo/lightlogo.png" alt="Logo" width="150" height="100" />
-                  }
+                  <img
+                    src={theam ? "/Logo/Darklogo.png" : "/Logo/lightlogo.png"}
+                    alt="Logo"
+                    className="w-28 sm:w-32 md:w-35 lg:w-38 h-auto"
+                  />
                 </ScroolLink>
               ) : (
                 <RouteLink onClick={() => (setMobileMenuOpen(false))} className="flex items-center cursor-pointer" to="/dashboard">
-                  {theam ? 
-                  <img src="/Logo/Darklogo.png" alt="Logo" width="150" height="100" />
-                  :
-                  <img src="/Logo/lightlogo.png" alt="Logo" width="150" height="100" />
-                  }
+                  <img
+                    src={theam ? "/Logo/Darklogo.png" : "/Logo/lightlogo.png"}
+                    alt="Logo"
+                    className="w-28 sm:w-32 md:w-35 lg:w-38 h-auto"
+                  />
                 </RouteLink>
               )
             }
