@@ -213,7 +213,6 @@ export class DatabaseService {
                 ),
             ]);
 
-            console.log(allPost,"\n",publicPost,"\n",privatePost,"\n",draftPost);
             return {
                 success: true,
                 allPost,
@@ -328,7 +327,6 @@ export class DatabaseService {
     }
 
     async getUserPostRealtime({
-        userId = null,
         lastDocumentId = null,
         limit = 10,
         status = null,

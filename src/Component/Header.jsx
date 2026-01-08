@@ -232,7 +232,7 @@ const Header = () => {
                       My Post
                     </RouteNavLink>
                     <RouteNavLink
-                      to="/dashboard/post/publicpost"
+                      to="/dashboard/publicpost"
                       onClick={toggleMenu}
                       className={({ isActive }) =>
                         `block py-2 pr-4 pl-3 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-red-400 lg:p-0 dark:hover:bg-gray-700 lg:dark:hover:bg-transparent dark:border-gray-700 dark:hover:text-red-300 ${isActive ? "text-red-500 dark:text-red-400" : "text-black dark:text-white"}`

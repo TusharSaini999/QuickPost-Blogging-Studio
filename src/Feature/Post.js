@@ -2,10 +2,12 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import databaseService from "../Appwrite/databases";
 
 const initialState = {
+    InitialReq:false,
     AllPost: {},
     PublicPost: {},
     PrivatePost: {},
     DraftPost: {},
+    cursors:{},
     HistoryData: {},
     getloading: true,
     error: null,
@@ -18,8 +20,23 @@ export const getPost = createAsyncThunk(
     "Post/getPost",
     async (payload, { rejectWithValue }) => {
         try {
-            let data = await databaseService.getAllTypePost({ userId: payload });
+            let data = await databaseService.getAllTypePost(payload);
+            console.log("Data come in thank",payload)
+            console.log("Data Return by thank",data)
             if (data.success) {
+                // if(payload.types=="all" && data.allPost==null){
+                //     data.cursors.all=null;
+                // }
+                // console.log(data.publicPost)
+                // if(payload.types=="public" && data.publicPost=={}){
+                //     data.cursors.public=null;
+                // }
+                // if(payload.types=="private" && data.privatePost==null){
+                //     data.cursors.private=null;
+                // }
+                // if(payload.types=="drafts" && data.draftPost==null){
+                //     data.cursors.draft=null;
+                // }
                 return data;
             }
             else {
@@ -193,26 +210,29 @@ const PostSlice = createSlice({
                 state.getStatus = "Pending";
             })
             .addCase(getPost.fulfilled, (state, action) => {
-                for (const post of action.payload.allPost.documents) {
+                for (const post of action.payload.allPost?.documents) {
                     if (!state.AllPost[post.$id]) {
                         state.AllPost[post.$id] = post;
                     }
                 }
-                for (const post of action.payload.publicPost.documents) {
+                for (const post of action.payload.publicPost?.documents) {
                     if (!state.PublicPost[post.$id]) {
                         state.PublicPost[post.$id] = post;
                     }
                 }
-                for (const post of action.payload.privatePost.documents) {
+                for (const post of action.payload.privatePost?.documents) {
                     if (!state.PrivatePost[post.$id]) {
                         state.PrivatePost[post.$id] = post;
                     }
                 }
-                for (const post of action.payload.draftPost.documents) {
+                for (const post of action.payload.draftPost?.documents) {
                     if (!state.DraftPost[post.$id]) {
                         state.DraftPost[post.$id] = post;
                     }
                 }
+                state.InitialReq=true;
+                console.log("Curser in the Extrabulder:",action.payload.cursors)
+                state.cursors=action.payload.cursors;
                 state.getloading = false;
                 state.error = null;
                 state.getStatus = "Completed";
@@ -222,10 +242,10 @@ const PostSlice = createSlice({
                 state.error = action.payload;
                 state.getStatus = "Error";
             })
-            .addCase(createPost.pending, (state, action) => {
+            .addCase(createPost.pending, (state) => {
                 state.createStatus = "Pending";
             })
-            .addCase(createPost.fulfilled, (state, action) => {
+            .addCase(createPost.fulfilled, (state) => {
                 state.createStatus = "Completed";
             })
             .addCase(createPost.rejected, (state, action) => {

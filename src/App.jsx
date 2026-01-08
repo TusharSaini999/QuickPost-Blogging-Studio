@@ -43,7 +43,7 @@ function App() {
         dispatch(setloading(true));
         const userData = await authService.checkUser();
         if (userData.success) {
-          dispatch(getPost(userData.user?.$id));
+          dispatch(getPost({userId:userData.user?.$id,defaults: true}));
           console.log(post);
           if (userData.user.prefs?.Profile_Created) {
             dispatch(login(userData.user));
