@@ -1,5 +1,5 @@
-import Footer from "./Component/Footer";
-import Header from "./Component/Header"
+import Footer from "./Component/Footer.jsx";
+import Header from "./Component/Header.jsx"
 import { Outlet, useNavigate } from "react-router";
 import { useDispatch, useSelector } from 'react-redux';
 import { login, logout, updateName } from './Feature/Auth.js';
