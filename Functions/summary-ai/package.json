@@ -1,5 +1,5 @@
 {
-  "name": "starter-template",
+  "name": "summary-ai",
   "version": "1.0.0",
   "description": "",
   "main": "src/main.js",
@@ -8,7 +8,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "node-appwrite": "^14.1.0"
+    "node-appwrite": "^14.1.0",
+    "@google/genai": "^0.3.0"
   },
   "devDependencies": {
     "prettier": "^3.2.5"
