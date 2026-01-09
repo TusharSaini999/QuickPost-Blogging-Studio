@@ -398,7 +398,8 @@ export class DatabaseService {
         }
     }
 
-    async getPublicPosts({ lastDocumentId = null, limit = 9 }) {
+    async getPublicPosts({ lastDocumentId = null, limit = 9, search = "" }) {
+        console.log(search);
         try {
             const queries = [
                 Query.equal("status", "post"),
@@ -410,13 +411,18 @@ export class DatabaseService {
             if (lastDocumentId) {
                 queries.push(Query.cursorAfter(lastDocumentId));
             }
+            var edit=false;
+            if (search && search.trim() !== "") {
+                queries.push(Query.search("titles", search));
+                edit=true;
+            }
 
             const res = await this.databases.listDocuments(
                 env.APPWRITE_DB_ID,
                 env.APPWRITE_COLLECTION_ID,
                 queries
             );
-            
+
             var lastId = lastDocumentId;
             if (res.documents.length < limit) {
                 lastId = null;
@@ -427,6 +433,7 @@ export class DatabaseService {
                 success: true,
                 list: res.documents,
                 lastId: lastId,
+                searchmode:edit
             };
         } catch (err) {
             return {
