@@ -24,19 +24,6 @@ export const getPost = createAsyncThunk(
             console.log("Data come in thank",payload)
             console.log("Data Return by thank",data)
             if (data.success) {
-                // if(payload.types=="all" && data.allPost==null){
-                //     data.cursors.all=null;
-                // }
-                // console.log(data.publicPost)
-                // if(payload.types=="public" && data.publicPost=={}){
-                //     data.cursors.public=null;
-                // }
-                // if(payload.types=="private" && data.privatePost==null){
-                //     data.cursors.private=null;
-                // }
-                // if(payload.types=="drafts" && data.draftPost==null){
-                //     data.cursors.draft=null;
-                // }
                 return data;
             }
             else {

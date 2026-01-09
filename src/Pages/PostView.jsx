@@ -10,11 +10,12 @@ const PostView = () => {
     const draftPost = useSelector((state) => state.PostSlice.DraftPost);
     const publicPost=useSelector((state) => state.PostSlice.PublicPost);
     const privatePost=useSelector((state) => state.PostSlice.PrivatePost);
+    const GlobalPost=useSelector((state)=>state.GobalSlice.posts)
     const [post, setPost] = useState({});
     const [loading, setLoading] = useState(false);
     useEffect(() => {
         setLoading(true);
-        if (postdata[id] || draftPost[id] || publicPost[id] || privatePost[id]) {
+        if (postdata[id] || draftPost[id] || publicPost[id] || privatePost[id] || GlobalPost[id]) {
             let temp;
             if(postdata[id]){
                 temp=postdata[id];
@@ -24,6 +25,8 @@ const PostView = () => {
                 temp=publicPost[id];
             }else if(privatePost[id]){
                 temp=privatePost[id];
+            }else if(GlobalPost[id]){
+                temp=GlobalPost[id];
             }
             
             let visibility = "";

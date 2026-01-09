@@ -131,7 +131,7 @@ export class DatabaseService {
                 shortDescription: Short_Description,
                 tags: Tags
             }
-            data.createdAt=new Date().toISOString();
+            data.createdAt = new Date().toISOString();
             let fileRes;
             if (feturedImage) {
                 let imageID = ID.unique();
@@ -182,36 +182,100 @@ export class DatabaseService {
             }
         }
     }
-    async getAllTypePost({ userId }) {
-        let queries = [
-            Query.orderDesc("createdAt"),
-            Query.limit(9),
-            Query.equal("userid", userId)
-        ];
 
+    async getAllTypePost({
+        userId,
+        lastIds = {},
+        types = "all", //"all" | "public" | "private" | "drafts" |
+        limit = 9,
+        defaults = false
+    }) {
         try {
-            const [allPost, publicPost, privatePost, draftPost] = await Promise.all([
-                this.databases.listDocuments(
+            const base = [
+                Query.orderDesc("createdAt"),
+                Query.limit(limit),
+                Query.equal("userid", userId),
+            ];
+            let allCur = lastIds?.all || null;
+            let publicCur = lastIds?.public || null;
+            let privateCur = lastIds?.private || null;
+            let draftsCur = lastIds?.draft || null;
+            let allPost = { documents: [] };
+            let publicPost = { documents: [] };
+            let privatePost = { documents: [] };
+            let draftPost = { documents: [] };
+
+
+            if (defaults || types == "all") {
+                let query = [...base, Query.notEqual("status", "Deleted")]
+                if (!defaults) {//This is Second to N call
+                    query = [...query, Query.cursorAfter(lastIds.all)];
+
+                }
+                allPost = await this.databases.listDocuments(
                     env.APPWRITE_DB_ID,
                     env.APPWRITE_COLLECTION_ID,
-                    [...queries, Query.notEqual("status", "Deleted")]
-                ),
-                this.databases.listDocuments(
+                    query
+                );
+                if (allPost.documents.length === limit) {
+                    allCur = allPost.documents[allPost.documents.length - 1].$id;
+                } else {
+                    allCur = null;
+                }
+                console.log("Call in the API", allPost, "Curcser logic", allCur);
+            }
+            if (defaults || types == "public") {
+                let query = [...base, Query.equal("visibility", "Public"), Query.equal("status", "Post")]
+                if (!defaults) {//This is Second to N call
+                    query = [...query, Query.cursorAfter(lastIds.public)];
+
+                }
+                publicPost = await this.databases.listDocuments(
                     env.APPWRITE_DB_ID,
                     env.APPWRITE_COLLECTION_ID,
-                    [...queries, Query.equal("visibility", "Public"), Query.equal("status", "Post")]
-                ),
-                this.databases.listDocuments(
+                    query
+                );
+                if (publicPost.documents.length === limit) {
+                    publicCur = publicPost.documents[publicPost.documents.length - 1].$id;
+                } else {
+                    publicCur = null;
+                }
+                console.log("Call in the API", publicPost, "Curcser logic", publicCur);
+            }
+            if (defaults || types == "private") {
+                let query = [...base, Query.equal("visibility", "Private"), Query.equal("status", "Post")]
+                if (!defaults) {//This is Second to N call
+                    query = [...query, Query.cursorAfter(lastIds.private)];
+                }
+                privatePost = await this.databases.listDocuments(
                     env.APPWRITE_DB_ID,
                     env.APPWRITE_COLLECTION_ID,
-                    [...queries, Query.equal("visibility", "Private"), Query.equal("status", "Post")]
-                ),
-                this.databases.listDocuments(
+                    query
+                );
+                if (privatePost.documents.length === limit) {
+                    privateCur = privatePost.documents[privatePost.documents.length - 1].$id;
+                } else {
+                    privateCur = null;
+                }
+                console.log("Call in the API", privatePost, "Curcser logic", privateCur);
+            }
+            if (defaults || types == "drafts") {
+                let query = [...base, Query.equal("status", "Draft")]
+                if (!defaults) {//This is Second to N call
+                    query = [...query, Query.cursorAfter(lastIds.draft)];
+                }
+                draftPost = await this.databases.listDocuments(
                     env.APPWRITE_DB_ID,
                     env.APPWRITE_COLLECTION_ID,
-                    [...queries, Query.equal("status", "Draft")]
-                ),
-            ]);
+                    query
+                );
+                if (draftPost.documents.length === limit) {
+                    draftsCur = draftPost.documents[draftPost.documents.length - 1].$id;
+                } else {
+                    draftsCur = null;
+                }
+                console.log("Call in the API", draftPost, "Curcser logic", draftsCur);
+            }
 
             return {
                 success: true,
@@ -219,7 +283,14 @@ export class DatabaseService {
                 publicPost,
                 privatePost,
                 draftPost,
+                cursors: {
+                    all: allCur,
+                    public: publicCur,
+                    private: privateCur,
+                    draft: draftsCur,
+                }
             };
+
         } catch (error) {
             return {
                 success: false,
@@ -227,12 +298,13 @@ export class DatabaseService {
                 code: error.code || 500,
                 message: error.message || "Something went wrong",
             };
+
         }
     }
 
-    async updatePost({ title, content, fetureimage, status, userid,Short_Description, visibility, $id,Tags, dataObject, PrevousData }) {
+    async updatePost({ title, content, fetureimage, status, userid, Short_Description, visibility, $id, Tags, dataObject, PrevousData }) {
         try {
-            console.log({ title, content, fetureimage, status, userid,Short_Description, visibility, $id,Tags, dataObject, PrevousData });
+            console.log({ title, content, fetureimage, status, userid, Short_Description, visibility, $id, Tags, dataObject, PrevousData });
             let data = {
                 titles: title,
                 content: content,
@@ -242,8 +314,8 @@ export class DatabaseService {
                 shortDescription: Short_Description,
                 tags: Tags
             };
-            if(PrevousData?.status=="Draft" && status=="Post"){
-                data.createdAt=new Date().toISOString();
+            if (PrevousData?.status == "Draft" && status == "Post") {
+                data.createdAt = new Date().toISOString();
             }
             let fileRes;
             let imageUrl = null;
@@ -271,7 +343,7 @@ export class DatabaseService {
                 data
             )
             if (document) {
-                let mainUpdateLable = await authService.updateLabels({dataObject});
+                let mainUpdateLable = await authService.updateLabels({ dataObject });
                 if (mainUpdateLable.status) {
                     return {
                         success: true,
@@ -326,81 +398,45 @@ export class DatabaseService {
         }
     }
 
-    async getUserPostRealtime({
-        lastDocumentId = null,
-        limit = 10,
-        status = null,
-        visibility = null,
-        onEvent = () => { }
-    }) {
-        let queries = [
-            Query.orderDesc("createdAt"),
-            Query.limit(limit),
-        ];
-        if (status) {
-            queries.push(Query.equal("status", status))
-        }
-        if (lastDocumentId) {
-            queries.push(Query.cursorAfter(lastDocumentId));
-        }
-        if (userId) {
-            queries.push(Query.equal("userid", userId));
-        }
-        if (visibility) {
-            queries.push(Query.equal("visibility", visibility));
-        }
-
+    async getPublicPosts({ lastDocumentId = null, limit = 9 }) {
         try {
-            let getResp = await this.databases.listDocuments(
+            const queries = [
+                Query.equal("status", "post"),
+                Query.equal("visibility", "public"),
+                Query.orderDesc("$updatedAt"),
+                Query.limit(limit),
+            ];
+
+            if (lastDocumentId) {
+                queries.push(Query.cursorAfter(lastDocumentId));
+            }
+
+            const res = await this.databases.listDocuments(
                 env.APPWRITE_DB_ID,
                 env.APPWRITE_COLLECTION_ID,
                 queries
             );
-
-            let lastId = null;
-            if (getResp.documents.length > 0) {
-                lastId = getResp.documents[getResp.documents.length - 1].$id;
+            
+            var lastId = lastDocumentId;
+            if (res.documents.length < limit) {
+                lastId = null;
+            } else {
+                lastId = res.documents[res.documents.length - 1].$id ?? null
             }
-
-            const channel = `databases.${env.APPWRITE_DB_ID}.collections.${env.APPWRITE_COLLECTION_ID}.documents`;
-
-            const unsubscribe = this.client.subscribe([channel], (event) => {
-                const ev = event.events || [];
-                const doc = event.payload;
-
-                if (doc.status === status &&
-                    (!userId || doc.userid === userId) &&
-                    (!visibility || doc.visibility === visibility)) {
-
-                    onEvent({
-                        type: ev.some(e => e.endsWith(".create"))
-                            ? "create"
-                            : ev.some(e => e.endsWith(".update"))
-                                ? "update"
-                                : ev.some(e => e.endsWith(".delete"))
-                                    ? "delete"
-                                    : "other",
-                        document: doc
-                    });
-                }
-            });
-
             return {
                 success: true,
-                list: getResp,
+                list: res.documents,
                 lastId: lastId,
-                unsubscribe
             };
-
         } catch (err) {
             return {
                 success: false,
-                type: err.type,
-                code: err.code,
-                message: err.message
+                message: err.message,
             };
         }
     }
+
+
 
 
     //Profile

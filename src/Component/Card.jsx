@@ -10,7 +10,8 @@ function Card({
     shortDescription = "This is the short description of the post. It should look clean, subtle, and not overpower the title.",
     delet = () => { console.log("You Click The Delete") },
     onClick = () => { console.log("You Click The Card") },
-    onEdit = () => { console.log("Edit") }
+    onEdit = () => { console.log("Edit") },
+    editmode = true
 }) {
     const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
 
@@ -43,7 +44,7 @@ function Card({
         Private: "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300",
         Draft: "bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-400",
     };
-
+    
     return (
         <div
             onMouseMove={handleMouseMove}
@@ -59,18 +60,20 @@ function Card({
             <div className="relative">
                 <img src={imageLink} alt={title} onClick={onClick} className="w-full h-55 object-cover" />
                 <div className="absolute top-2 right-2 flex gap-2">
-                    <button
-                        className="p-2 bg-gray-800/70 hover:bg-gray-900 text-white rounded-full transition-transform transform hover:scale-110 shadow-md"
-                        onClick={onEdit}
-                    >
-                        <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                        onClick={delet}
-                        className="p-2 bg-red-600/80 hover:bg-red-700 text-white rounded-full transition-transform transform hover:scale-110 shadow-md"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </button>
+                    {editmode && (
+                        <><button
+                            className="p-2 bg-gray-800/70 hover:bg-gray-900 text-white rounded-full transition-transform transform hover:scale-110 shadow-md"
+                            onClick={onEdit}
+                        >
+                            <Pencil className="w-4 h-4" />
+                        </button>
+                            <button
+                                onClick={delet}
+                                className="p-2 bg-red-600/80 hover:bg-red-700 text-white rounded-full transition-transform transform hover:scale-110 shadow-md"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                        </>)}
                 </div>
             </div>
 

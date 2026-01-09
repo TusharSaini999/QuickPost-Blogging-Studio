@@ -16,7 +16,7 @@ import UniversalError from './Component/Error.jsx';
 import Edit from './Pages/Edit.jsx';
 import Post from './Pages/Post.jsx';
 import PostView from './Pages/PostView.jsx';
-import PublicPosts from './Pages/Test.jsx'
+import PublicPosts from './Pages/GlobalPost.jsx'
 
 let router = createBrowserRouter([
   {

@@ -24,7 +24,7 @@ function Post({ type = "all" }) {
     const [sortOrder, setSortOrder] = useState("desc");
     const [sortBy, setSortBy] = useState("updated");
 
-    const [loadingMore, setLoadingMore] = useState(false); 
+    const [loadingMore, setLoadingMore] = useState(false);
 
     const [modalData, setModalData] = useState({
         type: "success",
@@ -72,7 +72,7 @@ function Post({ type = "all" }) {
     // -----------------------------
     useEffect(() => {
         if (postSlice.getStatus === "Error") {
-            dispatch(getPost({ userId: userData?.$id,defaults: true }));
+            dispatch(getPost({ userId: userData?.$id, defaults: true }));
         }
 
         if (type === "all") {
@@ -125,7 +125,8 @@ function Post({ type = "all" }) {
             const scrollHeight = document.documentElement.scrollHeight;
             const scrollTop = document.documentElement.scrollTop;
             const clientHeight = window.innerHeight;
-
+            const cursor = postSlice?.cursors?.[type];
+            if (!cursor) return;
             // When user scrolls near bottom, load more posts
             if (scrollTop + clientHeight >= scrollHeight - 300) {
                 loadMore();
