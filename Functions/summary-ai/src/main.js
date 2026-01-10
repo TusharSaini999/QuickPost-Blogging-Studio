@@ -1,4 +1,3 @@
-import { Client } from "node-appwrite";
 import { GoogleGenAI } from "@google/genai";
 
 // Length instruction mapping
@@ -8,20 +7,23 @@ const lengthMap = {
   Long: "in 8–10 detailed but readable sentences",
 };
 
-// Build AI prompt
-function buildPrompt(content, length) {
+function buildPrompt({ title, shortDescription, content, length }) {
   return `
 You are an expert blog editor and content summarizer.
 
-Your task is to summarize the following blog post for readers of a blogging platform.
+Your task is to write a natural, reader-friendly summary for a blog post on a blogging platform.
+
+Context:
+- Blog Title: "${title || "Not provided"}"
+- Existing Short Description (for reference only, do not reuse text): "${shortDescription || "Not provided"}"
 
 Guidelines:
 - Write a clear, human-like summary
-- Do NOT copy sentences directly from the blog
+- Do NOT copy sentences from the blog, title, or short description
 - Preserve the original meaning and key ideas
 - Avoid unnecessary jargon
 - Do not add new information
-- Do not use bullet points, headings, or emojis
+- Do not use bullet points, headings, emojis, or markdown
 
 Length requirement:
 Write the summary ${lengthMap[length] || lengthMap.Medium}.
@@ -33,38 +35,41 @@ ${content}
 
 export default async ({ req, res, log, error }) => {
   try {
-    // Only allow POST
     if (req.method !== "POST") {
-      return res.json(
-        { error: "Only POST method is allowed" },
-        405
-      );
+      return res.json({ error: "Only POST method is allowed" }, 405);
     }
 
-    // Parse request body
     const body =
       typeof req.body === "string"
         ? JSON.parse(req.body)
         : req.body;
 
-    const { content, length } = body;
+    const {
+      title = "",
+      shortDescription = "",
+      content,
+      length = "Medium",
+    } = body;
 
     // Validation
-    if (!content || content.trim().length < 20) {
+    if (!content || content.trim().length < 50) {
       return res.json(
-        { error: "Post content is required and must be meaningful" },
+        { error: "Post content must be at least 50 characters long" },
         400
       );
     }
 
-    // Init Gemini
     const ai = new GoogleGenAI({
       apiKey: process.env.GEMINI_API_KEY,
     });
 
-    const prompt = buildPrompt(content, length);
+    const prompt = buildPrompt({
+      title,
+      shortDescription,
+      content,
+      length,
+    });
 
-    // Call Gemini
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: prompt,
@@ -81,9 +86,12 @@ export default async ({ req, res, log, error }) => {
     return res.json({
       success: true,
       summary,
-      length: length || "Medium",
+      meta: {
+        length,
+        titleProvided: Boolean(title),
+        shortDescriptionProvided: Boolean(shortDescription),
+      },
     });
-
   } catch (err) {
     error("Summary generation failed: " + err.message);
 
