@@ -13,11 +13,12 @@ import StatusModal from "./Component/PopupMessage.jsx";
 import { getPost } from "./Feature/Post.js";
 import ErrorMessage from "./Component/ErrorMessage.jsx";
 import { clearError } from "./Feature/Post.js";
+import ai_function from "./Appwrite/ai_function.js";
 
 function App() {
   const dispatch = useDispatch();
   const location = useLocation();
-  const post=useSelector((state)=>state.PostSlice)
+  const post = useSelector((state) => state.PostSlice)
   const nav = useNavigate();
   const [isloading, setisloading] = useState(false);
   const [signlogin, setsignlogin] = useState(false);
@@ -25,7 +26,7 @@ function App() {
   const status = useSelector((state) => state.ProfileSlice.savestatus);
   const historyName = useSelector((state) => state.ProfileSlice.historyName);
   const [showModal, setShowModal] = useState(false);
-  const errormessage=useSelector((state) => state.PostSlice.error);
+  const errormessage = useSelector((state) => state.PostSlice.error);
   const [modalInfo, setModalInfo] = useState({
     type: "success",
     title: "",
@@ -43,7 +44,7 @@ function App() {
         dispatch(setloading(true));
         const userData = await authService.checkUser();
         if (userData.success) {
-          dispatch(getPost({userId:userData.user?.$id,defaults: true}));
+          dispatch(getPost({ userId: userData.user?.$id, defaults: true }));
           console.log(post);
           if (userData.user.prefs?.Profile_Created) {
             dispatch(login(userData.user));
@@ -95,6 +96,18 @@ function App() {
     }
   }, [location])
   useEffect(() => {
+    const make = async () => {
+      const res = await ai_function.aiMetaDataGenerator({
+        "title": "Understanding React Hooks",
+        "shortDescription": "A beginner-friendly guide to React Hooks with examples",
+        "keywords": ["react", "react hooks", "javascript"],
+        "content": "React Hooks are a powerful feature introduced in React 16.8 that allow developers to use state and other React features without writing class components. Hooks like useState and useEffect help manage component logic in a cleaner and more reusable way. In this article, we explore how React Hooks work, why they are useful, and how to use them effectively with practical examples."
+      });
+      console.log(res);
+    }
+    make();
+  }, [])
+  useEffect(() => {
     if (status === "Completed") {
       console.log("Complete the work");
 
@@ -104,7 +117,6 @@ function App() {
         type: "error",
         title: "Profile Update Failed",
         description: "Your profile wasn’t updated. Please check your connection and try again."
-
       });
       setShowModal(true);
 
@@ -113,14 +125,14 @@ function App() {
     }
   }, [status]);
 
-  useEffect(()=>{
-    if(errormessage!=null){
-    const timer = setTimeout(() =>{
-      dispatch(clearError());
-    } , 3000);
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    if (errormessage != null) {
+      const timer = setTimeout(() => {
+        dispatch(clearError());
+      }, 3000);
+      return () => clearTimeout(timer);
     }
-  },[errormessage])
+  }, [errormessage])
   return (
     <>
 

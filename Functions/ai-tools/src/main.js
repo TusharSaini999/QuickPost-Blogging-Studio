@@ -1,5 +1,5 @@
 import { summaryAI } from "./summary.js";
-import { seoEnhancer } from "./seoEnhancer.js";
+import aiMetaDataGenerator from "./ai_metadata_generator.js"
 
 export default async (context) => {
   const { req, res } = context;
@@ -12,8 +12,8 @@ export default async (context) => {
     return summaryAI(context);
   }
 
-  if (req.path === "/ai-seo-enhancer") {
-    return seoEnhancer(context);
+  if (req.path === "/ai-metadata-generator") {
+    return aiMetaDataGenerator(context);
   }
 
   return res.json(

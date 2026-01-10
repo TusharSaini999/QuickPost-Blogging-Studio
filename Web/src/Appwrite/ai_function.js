@@ -11,7 +11,7 @@ export class Ai_function {
     async ai_summery({ title, shortDescription, content, length }) {
         try {
             const execution = await this.function.createExecution(
-                env.APPWRITE_FUNCTION_AISUMMMERY, 
+                env.APPWRITE_FUNCTION_AITOOL,
                 JSON.stringify({
                     title,
                     shortDescription,
@@ -33,9 +33,9 @@ export class Ai_function {
                     summary: res?.summary
                 }
             } else {
-                return{
-                    success:false,
-                    error:res.error
+                return {
+                    success: false,
+                    error: res.error
                 }
             }
         } catch (error) {
@@ -45,6 +45,47 @@ export class Ai_function {
             }
         }
     }
+    async aiMetaDataGenerator({ title, shortDescription, keywords, content }) {
+    try {
+        const execution = await this.function.createExecution(
+            env.APPWRITE_FUNCTION_AITOOL,
+            JSON.stringify({
+                title,
+                shortDescription,
+                keywords,
+                content,
+            }),
+            false,
+            "/ai-metadata-generator",
+            ExecutionMethod.POST,
+            {
+                "Content-Type": "application/json",
+            }
+        );
+
+        console.log(execution);
+
+        const res = JSON.parse(execution?.responseBody);
+
+        if (res?.success) {
+            return {
+                success: true,
+                metaDataResult: res.metaDataResult,
+            };
+        }
+
+        return {
+            success: false,
+            error: res?.error || "Metadata generation failed",
+        };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.message || "Unexpected error",
+        };
+    }
+}
+
 }
 
 const ai_function = new Ai_function();
