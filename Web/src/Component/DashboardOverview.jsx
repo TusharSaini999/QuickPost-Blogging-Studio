@@ -112,7 +112,7 @@ export default function DashboardOverview({
             <ActionButton icon={<Unlock className="h-5 w-5" />} to={"/dashboard/post/public"}>My Public Post</ActionButton>
             <ActionButton icon={<Lock className="h-5 w-5" />} to={"/dashboard/post/private"}>My Private Post</ActionButton>
             <ActionButton icon={<FileEdit className="h-5 w-5" />} to={"/dashboard/post/drafts"}>Drafts Post</ActionButton>
-            <ActionButton icon={<CheckCircle2 className="h-5 w-5" />} to={"/dashboard/post/publicpost"}>All Public Post</ActionButton>
+            <ActionButton icon={<CheckCircle2 className="h-5 w-5" />} to={"/dashboard/publicpost"}>All Public Post</ActionButton>
           </div>
         </section>
 

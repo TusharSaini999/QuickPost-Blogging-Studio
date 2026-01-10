@@ -72,7 +72,7 @@ let router = createBrowserRouter([
         children: [
           {
             path: "",
-            element: < Post type='all'/>
+            element: < Post type='all' />
           },
           {
             path: "public",
@@ -88,17 +88,26 @@ let router = createBrowserRouter([
           },
           {
             path: "view/:id",
-            Component:PostView
+            Component: PostView
           },
           {
             path: "edit/:id",
-            Component:Edit
+            Component: Edit
           }
         ]
       },
       {
-        path:"publicPost",
-        Component:PublicPosts
+        path: "publicPost",
+        children: [
+          {
+            path: "",
+            element: <PublicPosts/>
+          },
+          {
+            path: "view/:id",
+            Component: PostView
+          },
+        ]
       }
     ]
   }
