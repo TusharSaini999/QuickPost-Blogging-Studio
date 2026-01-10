@@ -67,7 +67,7 @@ export async function summaryAI({ req, res, log, error }) {
     });
 
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash", // ✅ stable
+      model: process.env.LLM_MODEL, // ✅ stable
       contents: buildPrompt({ title, shortDescription, content, length }),
     });
 
