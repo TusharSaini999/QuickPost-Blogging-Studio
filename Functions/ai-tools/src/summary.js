@@ -67,7 +67,8 @@ export async function summaryAI({ req, res, log, error }) {
       contents: prompt,
     });
 
-    const summary = response.text?.trim();
+    const summary = response.response.text().trim();
+
     if (!summary) throw new Error("Empty AI response");
 
     log("Summary generated");
