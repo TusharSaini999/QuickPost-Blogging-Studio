@@ -1,5 +1,5 @@
 import { summaryAI } from "./summary.js";
-import aiMetaDataGenerator from "./ai_metadata_generator.js"
+import { aiMetaDataGenerator } from "./ai_metadata_generator.js"
 
 export default async (context) => {
   const { req, res } = context;
