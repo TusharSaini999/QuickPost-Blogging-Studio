@@ -604,7 +604,7 @@ export class DatabaseService {
         console.log("Enter in Profile Update");
         try {
             let res;
-            // ✅ Step 1: Update name in auth service
+            //  Step 1: Update name in auth service
             if (Name) {
                 try {
                     console.log("Updating name in Auth...");
@@ -624,13 +624,13 @@ export class DatabaseService {
                 }
             }
 
-            // ✅ Step 2: Prepare profile data
+            //  Step 2: Prepare profile data
             let updateData = { Phone, Dob, Gender, Bio, Expertise, Location };
             if (Website && Website.trim() !== "") {
                 updateData.Website = Website;
             }
 
-            // ✅ Step 3: Handle profile photo
+            //  Step 3: Handle profile photo
             if (ProfileFile) {
                 try {
                     console.log("Resizing image...");
@@ -669,7 +669,7 @@ export class DatabaseService {
                 }
             }
 
-            // ✅ Step 4: Update profile document
+            //  Step 4: Update profile document
             try {
                 console.log("Updating document in DB...");
                 res = await this.databases.updateDocument(
@@ -693,7 +693,7 @@ export class DatabaseService {
                 };
             }
 
-            // ✅ Step 5: Return success
+            //  Step 5: Return success
             return { success: true, document: res, FileId };
 
         } catch (error) {
