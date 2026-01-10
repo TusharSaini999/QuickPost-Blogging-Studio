@@ -11,19 +11,18 @@ function buildPrompt({ title, shortDescription, content, length }) {
   return `
 You are an expert blog editor and content summarizer.
 
-Your task is to write a natural, reader-friendly summary for a blog post on a blogging platform.
+Your task is to write a natural, reader-friendly summary for a blog post.
 
 Context:
 - Blog Title: "${title || "Not provided"}"
-- Existing Short Description (for reference only, do not reuse text): "${shortDescription || "Not provided"}"
+- Existing Short Description (reference only): "${shortDescription || "Not provided"}"
 
 Guidelines:
 - Write a clear, human-like summary
-- Do NOT copy sentences from the blog, title, or short description
-- Preserve the original meaning and key ideas
-- Avoid unnecessary jargon
+- Do NOT copy sentences
+- Preserve original meaning
 - Do not add new information
-- Do not use bullet points, headings, emojis, or markdown
+- No bullet points or formatting
 
 Length requirement:
 Write the summary ${lengthMap[length] || lengthMap.Medium}.
@@ -33,16 +32,10 @@ ${content}
 `;
 }
 
-export default async ({ req, res, log, error }) => {
+export async function summaryAI({ req, res, log, error }) {
   try {
-    if (req.method !== "POST") {
-      return res.json({ error: "Only POST method is allowed" }, 405);
-    }
-
     const body =
-      typeof req.body === "string"
-        ? JSON.parse(req.body)
-        : req.body;
+      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
     const {
       title = "",
@@ -51,10 +44,9 @@ export default async ({ req, res, log, error }) => {
       length = "Medium",
     } = body;
 
-    // Validation
     if (!content || content.trim().length < 50) {
       return res.json(
-        { error: "Post content must be at least 50 characters long" },
+        { success: false, error: "Content must be at least 50 characters" },
         400
       );
     }
@@ -76,31 +68,19 @@ export default async ({ req, res, log, error }) => {
     });
 
     const summary = response.text?.trim();
+    if (!summary) throw new Error("Empty AI response");
 
-    if (!summary) {
-      throw new Error("Empty response from AI");
-    }
-
-    log("Summary generated successfully");
+    log("Summary generated");
 
     return res.json({
       success: true,
       summary,
-      meta: {
-        length,
-        titleProvided: Boolean(title),
-        shortDescriptionProvided: Boolean(shortDescription),
-      },
     });
   } catch (err) {
-    error("Summary generation failed: " + err.message);
-
+    error(err.message);
     return res.json(
-      {
-        success: false,
-        error: "Failed to generate summary",
-      },
+      { success: false, error: "Summary generation failed" },
       500
     );
   }
-};
+}
