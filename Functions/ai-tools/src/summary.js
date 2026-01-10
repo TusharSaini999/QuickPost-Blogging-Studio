@@ -1,6 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Length instruction mapping
 const lengthMap = {
   Short: "in 2–3 concise sentences",
   Medium: "in 4–6 well-structured sentences",
@@ -9,27 +8,44 @@ const lengthMap = {
 
 function buildPrompt({ title, shortDescription, content, length }) {
   return `
-You are an expert blog editor and content summarizer.
+You are a professional blog editor and content summarization expert.
 
-Your task is to write a natural, reader-friendly summary for a blog post.
+Your task is to write a clear, natural, reader-friendly summary of the blog post provided below.
 
 Context:
-- Blog Title: "${title || "Not provided"}"
-- Existing Short Description (reference only): "${shortDescription || "Not provided"}"
+- Blog title (for context only): "${title || "Not provided"}"
+- Existing short description (for reference only, do NOT reuse wording): "${shortDescription || "Not provided"}"
 
-Guidelines:
-- Write a clear, human-like summary
-- Do NOT copy sentences
-- Preserve original meaning
-- Do not add new information
-- No bullet points or formatting
+Instructions:
+- Summarize the blog in your own words
+- Preserve the original meaning and key ideas
+- Do NOT copy or rephrase sentences directly from the blog
+- Do NOT add new information, opinions, or assumptions
+- Use simple, human-like language
+- Do NOT use bullet points, headings, emojis, or markdown
+- Output must be plain text only
 
 Length requirement:
 Write the summary ${lengthMap[length] || lengthMap.Medium}.
 
-Blog Post Content:
+Blog content:
 ${content}
 `;
+}
+
+
+function extractGeminiText(response) {
+  if (typeof response.text === "function") {
+    return response.text();
+  }
+
+  if (response.candidates?.length) {
+    return response.candidates[0].content.parts
+      .map(p => p.text)
+      .join(" ");
+  }
+
+  return null;
 }
 
 export async function summaryAI({ req, res, log, error }) {
@@ -37,12 +53,7 @@ export async function summaryAI({ req, res, log, error }) {
     const body =
       typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-    const {
-      title = "",
-      shortDescription = "",
-      content,
-      length = "Medium",
-    } = body;
+    const { title = "", shortDescription = "", content, length = "Medium" } = body;
 
     if (!content || content.trim().length < 50) {
       return res.json(
@@ -55,32 +66,22 @@ export async function summaryAI({ req, res, log, error }) {
       apiKey: process.env.GEMINI_API_KEY,
     });
 
-    const prompt = buildPrompt({
-      title,
-      shortDescription,
-      content,
-      length,
-    });
-
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
+      model: "gemini-1.5-flash", // ✅ stable
+      contents: buildPrompt({ title, shortDescription, content, length }),
     });
 
-    const summary = response.response.text().trim();
+    const summary = extractGeminiText(response)?.trim();
 
     if (!summary) throw new Error("Empty AI response");
 
-    log("Summary generated");
+    log("Summary generated successfully");
 
-    return res.json({
-      success: true,
-      summary,
-    });
+    return res.json({ success: true, summary });
   } catch (err) {
-    error(err.message);
+    error("Summary AI Error: " + err.message);
     return res.json(
-      { success: false, error: "Summary generation failed" },
+      { success: false, error: err.message },
       500
     );
   }

@@ -19,12 +19,13 @@ export class Ai_function {
                     length,
                 }),
                 false,
-                "/",
+                "/summary-ai",
                 ExecutionMethod.POST,
                 {
                     "Content-Type": "application/json",
                 }
             );
+            console.log(execution)
             const res = JSON.parse(execution?.responseBody);
             if (res?.success) {
                 return {
