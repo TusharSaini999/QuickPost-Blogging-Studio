@@ -13,7 +13,7 @@ import StatusModal from "./Component/PopupMessage.jsx";
 import { getPost } from "./Feature/Post.js";
 import ErrorMessage from "./Component/ErrorMessage.jsx";
 import { clearError } from "./Feature/Post.js";
-import ai_function from "./Appwrite/ai_function.js";
+// import ai_function from "./Appwrite/ai_function.js";
 
 function App() {
   const dispatch = useDispatch();
@@ -95,18 +95,18 @@ function App() {
       }
     }
   }, [location])
-  useEffect(() => {
-    const make = async () => {
-      const res = await ai_function.aiMetaDataGenerator({
-        "title": "Understanding React Hooks",
-        "shortDescription": "A beginner-friendly guide to React Hooks with examples",
-        "keywords": ["react", "react hooks", "javascript"],
-        "content": "React Hooks are a powerful feature introduced in React 16.8 that allow developers to use state and other React features without writing class components. Hooks like useState and useEffect help manage component logic in a cleaner and more reusable way. In this article, we explore how React Hooks work, why they are useful, and how to use them effectively with practical examples."
-      });
-      console.log(res);
-    }
-    make();
-  }, [])
+  // useEffect(() => {
+  //   const make = async () => {
+  //     const res = await ai_function.aiMetaDataGenerator({
+  //       "title": "Understanding React Hooks",
+  //       "shortDescription": "A beginner-friendly guide to React Hooks with examples",
+  //       "keywords": ["react", "react hooks", "javascript"],
+  //       "content": "React Hooks are a powerful feature introduced in React 16.8 that allow developers to use state and other React features without writing class components. Hooks like useState and useEffect help manage component logic in a cleaner and more reusable way. In this article, we explore how React Hooks work, why they are useful, and how to use them effectively with practical examples."
+  //     });
+  //     console.log(res);
+  //   }
+  //   make();
+  // }, [])
   useEffect(() => {
     if (status === "Completed") {
       console.log("Complete the work");

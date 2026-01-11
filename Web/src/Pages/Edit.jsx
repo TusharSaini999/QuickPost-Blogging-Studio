@@ -8,7 +8,8 @@ import { useNavigate, useParams } from "react-router";
 import { updateEditPrefs, updatePrefs } from "../Feature/Auth";
 import { ID } from "appwrite";
 import databaseService from "../Appwrite/databases";
-
+import Ai_metadata from "../Component/Ai_metadata";
+import ai_function from "../Appwrite/ai_function";
 export default function CreatePost() {
   const editorRef = useRef(null);
   const dispatch = useDispatch();
@@ -25,6 +26,12 @@ export default function CreatePost() {
   const draftPost = useSelector((state) => state.PostSlice.DraftPost);
   const publicPost = useSelector((state) => state.PostSlice.PublicPost);
   const privatePost = useSelector((state) => state.PostSlice.PrivatePost);
+  const [propAI, setPropAI] = useState({
+    loading: false,
+    error: null
+  });
+  const [aires, setAiRes] = useState({});
+
   const {
     register,
     handleSubmit,
@@ -33,6 +40,7 @@ export default function CreatePost() {
     watch,
     reset,
     formState: { errors },
+    getValues,
   } = useForm({
     defaultValues: {
       title: "",
@@ -125,7 +133,7 @@ export default function CreatePost() {
           $id: id,
           currentData: { [dataObjectForStored.$id]: dataObjectForStored }
         }));
-        console.log("In Edit",payload,dataObjectForStored);
+        console.log("In Edit", payload, dataObjectForStored);
         nav(-1);
         setLoading(false);
       } else {
@@ -143,7 +151,7 @@ export default function CreatePost() {
           visibility: formData.visibility,
           dataObject: { ...userData?.prefs },
         };
-        
+
         let currentTime = new Date().toISOString();
         const dataObjectForStored = {
           name: userData?.name,
@@ -197,6 +205,70 @@ export default function CreatePost() {
     }
   };
 
+  //ai function
+  const handleGenerate = async () => {
+    setPropAI({ loading: true });
+    try {
+      const formData = getValues();
+      console.log(formData);
+      const res = await ai_function.aiMetaDataGenerator({
+        title: formData.title, shortDescription: formData.excerpt, keywords: formData.tags, content: formData.content
+
+      });
+      if (res?.success) {
+        setAiRes(res?.metaDataResult);
+        console.log(res);
+      } else {
+        setPropAI({ error: res?.error });
+      }
+    } catch (error) {
+      setPropAI({ error: error });
+    } finally {
+      setPropAI({ loading: false });
+    }
+
+  }
+  const onClose = (type) => {
+    if (type == "main") {
+      setAiRes({});
+    } else if (type == "title") {
+      setAiRes(prev => ({
+        ...prev,
+        title: null
+      }));
+    } else if (type == "sh") {
+      setAiRes(prev => ({
+        ...prev,
+        metaDescription: null
+      }));
+    } else if (type == "tag") {
+      setAiRes(prev => ({
+        ...prev,
+        keywords: null
+      }))
+    }
+  }
+  const onInsert = (type) => {
+    if (type == "title") {
+      setValue("title", aires?.title);
+      setAiRes(prev => ({
+        ...prev,
+        title: null
+      }));
+    } else if (type == "sh") {
+      setValue("excerpt", aires?.metaDescription);
+      setAiRes(prev => ({
+        ...prev,
+        metaDescription: null
+      }));
+    } else if (type == "tag") {
+      setValue("tags", aires?.keywords);
+      setAiRes(prev => ({
+        ...prev,
+        keywords: null
+      }));
+    }
+  }
   return (
     <>
       {isLoading ?
@@ -292,7 +364,7 @@ export default function CreatePost() {
               </label>
             )}
           </div>
-
+          <Ai_metadata loading={propAI.loading} error={propAI.error} content={"Let Artificial Intelligence create smarter content for you."} aiNotes={aires?.aiNote} mainBtn={"Genrate"} onMainBtn={handleGenerate} closeBtn={"X"} onCloseBtn={() => onClose("main")} />
           <div className="space-y-6">
             {/* Title */}
             <div>
@@ -308,7 +380,9 @@ export default function CreatePost() {
               />
               {errors.title && <p className="text-red-600 text-sm mt-1">{errors.title.message}</p>}
             </div>
+            <Ai_metadata content={aires?.title} mainBtn={"Insert"} onMainBtn={() => onInsert("title")} closeBtn={"X"} onCloseBtn={() => onClose("title")} />
 
+            <div className="space-y-6"></div>
             {/* Excerpt */}
             <div>
               <label className="block text-lg font-semibold mb-2">Short Description</label>
@@ -323,7 +397,7 @@ export default function CreatePost() {
               />
               {errors.excerpt && <p className="text-red-600 text-sm mt-1">{errors.excerpt.message}</p>}
             </div>
-
+            <Ai_metadata content={aires?.metaDescription} mainBtn={"Insert"} onMainBtn={() => onInsert("sh")} closeBtn={"X"} onCloseBtn={() => onClose("sh")} />
             {/* Tags */}
             <div>
               <label className="block text-lg font-semibold mb-2">Tags</label>
@@ -359,6 +433,14 @@ export default function CreatePost() {
                 ))}
               </div>
             </div>
+            <Ai_metadata
+              array={aires?.keywords}
+              mainBtn="Insert"
+              onMainBtn={() => onInsert("tag")}
+              closeBtn="X"
+              onCloseBtn={() => onClose("tag")}
+              arraytype={Array.isArray(aires?.keywords) && aires.keywords.length > 0}
+            />
 
             {/* Visibility */}
             <div>
@@ -505,8 +587,6 @@ export default function CreatePost() {
                 </div>
 
               )
-
-
             }
 
           </div>
