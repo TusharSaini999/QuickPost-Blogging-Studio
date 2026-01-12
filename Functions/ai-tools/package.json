@@ -8,8 +8,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "node-appwrite": "^14.1.0",
-    "@google/genai": "^0.3.0"
+    "groq-sdk": "^0.37.0",
+    "node-appwrite": "^14.1.0"
   },
   "devDependencies": {
     "prettier": "^3.2.5"

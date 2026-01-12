@@ -1,5 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
+import { Groq } from "groq-sdk";
 
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 /**
  * Build system-level instructions for the AI
  */
@@ -120,75 +121,52 @@ ${userQuery}
 `;
 }
 
-
-/**
- * Extract Gemini response safely
- */
-function extractGeminiText(response) {
-    if (typeof response.text === "function") {
-        return response.text();
-    }
-
-    if (response.candidates?.length) {
-        return response.candidates[0].content.parts
-            .map(p => p.text)
-            .join(" ");
-    }
-
-    return null;
-}
-
-/**
- * Chat AI Handler
- */
 export async function chatAI({ req, res, log, error }) {
-    try {
-        const body =
-            typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+  try {
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const { userQuery, userContext } = body;
 
-        const { userQuery, userContext } = body;
-
-        if (!userQuery || userQuery.trim().length < 2) {
-            return res.json(
-                { success: false, error: "userQuery is required" },
-                400
-            );
-        }
-
-        const ai = new GoogleGenAI({
-            apiKey: process.env.GEMINI_API_KEY,
-        });
-
-        // Build system + user prompts
-        const systemPrompt = buildSystemPrompt();
-        const userPrompt = buildUserPrompt({ userQuery, userContext });
-
-        log("System Prompt: " + systemPrompt);
-        log("User Prompt: " + userPrompt);
-
-        const response = await ai.models.generateContent({
-            model: process.env.LLM_MODEL,
-            contents: [
-                { role: "system", text: systemPrompt },
-                { role: "user", text: userPrompt }
-            ],
-        });
-
-        const reply = extractGeminiText(response)?.trim();
-
-        if (!reply) throw new Error("Empty AI response");
-
-        log("Chat response generated successfully");
-        log(reply);
-        return res.json({
-            success: true,
-            reply,
-        });
-    } catch (err) {
-        error("Chat AI Error: " + err.message);
-        return res.json(
-            { success: false, error: "The AI chat engine is currently unavailable. Please try again later." },
-            500
-        );
+    if (!userQuery || userQuery.trim().length < 2) {
+      return res.status(400).json({ success: false, error: "userQuery is required" });
     }
+
+    // Build system + user prompts
+    const systemPrompt = buildSystemPrompt();
+    const userPrompt = buildUserPrompt({ userQuery, userContext });
+
+    log("System Prompt: " + systemPrompt);
+    log("User Prompt: " + userPrompt);
+
+    // Call Groq API
+    const response = await groq.chat.completions.create({
+      model: process.env.LLM_MODEL || "openai/gpt-oss-120b",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      temperature: 0.7,
+      max_completion_tokens: 2000,
+      top_p: 1,
+      stream: false, // set to true for streaming
+      reasoning_effort: "medium",
+      // Optional: strict JSON if needed
+      // response_format: { type: "json_object" }
+    });
+
+    // Extract text from Groq response
+    const reply = response.choices?.[0]?.message?.content?.trim();
+
+    if (!reply) throw new Error("Empty AI response");
+
+    log("Chat response generated successfully");
+    log(reply);
+
+    return res.json({ success: true, reply });
+  } catch (err) {
+    error("Chat AI Error: " + err.message);
+    return res.status(500).json({
+      success: false,
+      error: "The AI chat engine is currently unavailable. Please try again later.",
+    });
+  }
 }

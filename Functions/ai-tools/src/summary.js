@@ -1,5 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
-
+import Groq from "groq-sdk";
+const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const lengthMap = {
   Short: "in 2–3 concise sentences",
   Medium: "in 4–6 well-structured sentences",
@@ -34,45 +34,32 @@ ${content}
 }
 
 
-function extractGeminiText(response) {
-  if (typeof response.text === "function") {
-    return response.text();
-  }
-
-  if (response.candidates?.length) {
-    return response.candidates[0].content.parts
-      .map(p => p.text)
-      .join(" ");
-  }
-
-  return null;
-}
-
 export async function summaryAI({ req, res, log, error }) {
   try {
-    const body =
-      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     const { title = "", shortDescription = "", content, length = "Medium" } = body;
 
     if (!content || content.trim().length < 50) {
-      return res.json(
-        { success: false, error: "Content must be at least 50 characters" },
-        400
-      );
+      return res.status(400).json({ success: false, error: "Content must be at least 50 characters" });
     }
 
-    const ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
+    // Initialize Groq client
+    
+
+    // Make request to GPT-OSS-120B
+    const response = await client.chat.completions.create({
+      model: process.env.LLM_MODEL || "openai/gpt-oss-120b",
+      messages: [
+        {
+          role: "user",
+          content: buildPrompt({ title, shortDescription, content, length })
+        }
+      ],
+      temperature: 0.7,
+      max_output_tokens: 2000
     });
 
-    const response = await ai.models.generateContent({
-      model: process.env.LLM_MODEL, // stable
-      contents: buildPrompt({ title, shortDescription, content, length }),
-    });
-
-    const summary = extractGeminiText(response)?.trim();
-
+    const summary = response.choices?.[0]?.message?.content?.trim();
     if (!summary) throw new Error("Empty AI response");
 
     log("Summary generated successfully");
@@ -80,9 +67,7 @@ export async function summaryAI({ req, res, log, error }) {
     return res.json({ success: true, summary });
   } catch (err) {
     error("Summary AI Error: " + err.message);
-    return res.json(
-      { success: false, error: err.message },
-      500
-    );
+    return res.status(500).json({ success: false, error: err.message });
   }
 }
+
