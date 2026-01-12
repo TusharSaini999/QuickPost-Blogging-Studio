@@ -32,7 +32,7 @@ export async function chatAI({ req, res, log, error }) {
         const retryAfter = apiErr.details?.find(d => d["@type"]?.includes("RetryInfo"))?.retryDelay || "a few seconds";
         const msg = `AI quota exceeded. Please try again after ${retryAfter}. Check your plan and usage.`;
         log("Gemini API Quota Exceeded: " + msg);
-        return res.status(429).json({ success: false, error: msg });
+        return res.json({ success: false, error: msg });
       }
 
       // Other API errors
