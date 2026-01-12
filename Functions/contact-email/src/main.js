@@ -204,7 +204,7 @@ What happens next?
 - Response time may vary during peak hours
 
 If you’d like to explore more, visit Quick Post:
-https://quickpost.app
+https://quickpostai.vercel.app/
 
 Warm regards,
 Quick Post Team
