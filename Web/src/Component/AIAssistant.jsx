@@ -1,333 +1,328 @@
 import React, { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Plus, ChevronLeft } from "lucide-react";
+import { MessageCircle, X, Send, Sparkles } from "lucide-react";
+import { useSelector } from "react-redux";
+import ai_function from "../Appwrite/ai_function";
 
-export default function AIAssistantSidebar({ fullPage = false }) {
+export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard", AICall }) {
+  // Chat state
   const [isOpen, setIsOpen] = useState(fullPage);
   const [isVisible, setIsVisible] = useState(fullPage);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(true);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
-  const [chatHistory, setChatHistory] = useState([]);
   const [typing, setTyping] = useState(false);
-  const [activeChatIndex, setActiveChatIndex] = useState(null);
 
+  // Sidebar size
   const [sidebarWidth, setSidebarWidth] = useState(600);
   const [sidebarHeight, setSidebarHeight] = useState(500);
-  const [darkMode, setDarkMode] = useState(false);
 
+  // Resizer refs
   const containerRef = useRef(null);
+  const leftResizerRef = useRef(null);
   const rightResizerRef = useRef(null);
   const topResizerRef = useRef(null);
+  const shouldAutoScrollRef = useRef(true);
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
-  // Auto scroll
-  useEffect(() => {
-    containerRef.current?.scrollTo({
-      top: containerRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [messages, typing]);
+  // User data
+  const userData = useSelector((s) => s.AuthSlice.userData);
 
-  // Resizing (desktop only)
+  // Base data for AI
+  let Data = {
+    name: userData?.name || "User",
+    totalPosts: {
+      Drafts: userData?.prefs?.Drafts || 0,
+      Private: userData?.prefs?.Private || 0,
+      Public: userData?.prefs?.Public || 0,
+    },
+    postPerWeek: userData?.prefs?.Week || 0,
+    navigationMenu: ["Home", "Profile", "Create Post", "My Post", "Public Post", "Logout"],
+  };
+
+  // Auto scroll when open
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      const threshold = 40;
+      const atBottom =
+        el.scrollHeight - el.scrollTop - el.clientHeight < threshold;
+
+      shouldAutoScrollRef.current = atBottom;
+    };
+
+    el.addEventListener("scroll", onScroll);
+    return () => el.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom(true);
+  }, [isOpen, isVisible]);
+
+  const scrollToBottom = (force = false) => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    if (!force && !shouldAutoScrollRef.current) return;
+
+    requestAnimationFrame(() => {
+      el.scrollTo({
+        top: el.scrollHeight,
+        behavior: "auto", // IMPORTANT
+      });
+    });
+  };
+
+
+  //Autoscroll When chat
+  useEffect(() => { if (containerRef.current) { containerRef.current.scrollTo({ top: containerRef.current.scrollHeight, behavior: "smooth" }); } }, [messages, typing]);
+
+  // Resizing logic
   useEffect(() => {
     if (fullPage) return;
 
     const handleMouseMove = (e) => {
       if (window.innerWidth < 768) return;
 
-      if (rightResizerRef.current?.isResizing) {
-        document.body.style.userSelect = "none";
-        let newWidth =
-          rightResizerRef.current.startWidth -
-          (e.clientX - rightResizerRef.current.startX);
-
-        if (newWidth < 500) newWidth = 500;
-        if (newWidth > 900) newWidth = 900;
-        setSidebarWidth(newWidth);
+      if (leftResizerRef.current?.isResizing) {
+        const newWidth = leftResizerRef.current.startWidth + (leftResizerRef.current.startX - e.clientX);
+        setSidebarWidth(Math.max(400, Math.min(newWidth, 900)));
       }
-
+      if (rightResizerRef.current?.isResizing) {
+        const newWidth = rightResizerRef.current.startWidth + (e.clientX - rightResizerRef.current.startX);
+        setSidebarWidth(Math.max(400, Math.min(newWidth, 900)));
+      }
       if (topResizerRef.current?.isResizing) {
-        document.body.style.userSelect = "none";
         const deltaY = topResizerRef.current.startY - e.clientY;
-        let newHeight = topResizerRef.current.startHeight + deltaY;
-
-        if (newHeight < 300) newHeight = 300;
-        if (newHeight > window.innerHeight - 50)
-          newHeight = window.innerHeight - 50;
-
-        setSidebarHeight(newHeight);
+        const newHeight = topResizerRef.current.startHeight + deltaY;
+        setSidebarHeight(Math.max(300, Math.min(newHeight, window.innerHeight - 50)));
       }
     };
 
     const handleMouseUp = () => {
-      if (rightResizerRef.current) rightResizerRef.current.isResizing = false;
-      if (topResizerRef.current) topResizerRef.current.isResizing = false;
-      document.body.style.userSelect = "";
+      leftResizerRef.current && (leftResizerRef.current.isResizing = false);
+      rightResizerRef.current && (rightResizerRef.current.isResizing = false);
+      topResizerRef.current && (topResizerRef.current.isResizing = false);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseup", handleMouseUp);
-
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [fullPage]);
 
-  // Resize handlers
-  const startHorizontalResize = (e) => {
+  const startResize = (ref, e) => {
     if (window.innerWidth < 768 || fullPage) return;
-    rightResizerRef.current.isResizing = true;
-    rightResizerRef.current.startX = e.clientX;
-    rightResizerRef.current.startWidth = sidebarWidth;
-  };
-  const startVerticalResize = (e) => {
-    if (window.innerWidth < 768 || fullPage) return;
-    topResizerRef.current.isResizing = true;
-    topResizerRef.current.startY = e.clientY;
-    topResizerRef.current.startHeight = sidebarHeight;
+    ref.current.isResizing = true;
+    ref === leftResizerRef || ref === rightResizerRef
+      ? (ref.current.startX = e.clientX)
+      : (ref.current.startY = e.clientY);
+    ref === leftResizerRef || ref === rightResizerRef
+      ? (ref.current.startWidth = sidebarWidth)
+      : (ref.current.startHeight = sidebarHeight);
   };
 
-  // Fake AI response
+  // AI call
+  const aiCall = async ({ userQuery, userContext }) => {
+    try {
+      const res = await ai_function.aiChat({ userQuery, userContext });
+      if (res.success) return res.reply;
+      throw new Error(res.error || "AI call failed");
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  // Add AI message
   const addAIMessage = async (userMessage) => {
     setTyping(true);
-    const aiResponse = `AI Suggestion for: "${userMessage}"`;
-    let displayText = "";
-    for (let i = 0; i < aiResponse.length; i++) {
-      displayText += aiResponse[i];
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { type: "ai", text: displayText },
-      ]);
-      await new Promise((r) => setTimeout(r, 15));
+    if (page === "Dashboard") {
+      Data = {
+        ...Data,
+        dashboardSummary: { welcomeMessage: "Welcome back, Tushar Saini" },
+        visibleSections: ["Top Navigation", "Dashboard Overview", "Post Statistics", "Quick Links", "Post Charts"],
+        quickLinks: ["New Post", "All Posts", "My Public Post", "My Private Post", "Drafts Post", "All Public Post"],
+        currentPageOnUser: "Dashboard",
+      };
+    } else {
+      const PageData = AICall();
+      Data = { ...Data, ...PageData };
+      console.log("This is The Page Data Come Form:", PageData);
     }
-    setTyping(false);
+    console.log("This Is Data For LLm", Data);
+    // Add placeholder AI message
+    let messageIndex;
+    setMessages((prev) => {
+      messageIndex = prev.length;
+      return [...prev, { type: "ai", text: "", loading: true, error: "" }];
+    });
+
+    try {
+      const aiResponse = await aiCall({ userQuery: userMessage, userContext: Data });
+      let displayText = "";
+      for (let i = 0; i < aiResponse.length; i++) {
+        displayText += aiResponse[i];
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[messageIndex] = { type: "ai", text: displayText, loading: false, error: "" };
+          return updated;
+        });
+        await new Promise((r) => setTimeout(r, 10));
+      }
+    } catch (err) {
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[messageIndex] = { type: "ai", text: "", loading: false, error: err.message };
+        return updated;
+      });
+    } finally {
+      setTyping(false);
+    }
   };
 
   const handleSend = () => {
     if (!input.trim()) return;
-    setMessages((prev) => [
-      ...prev,
-      { type: "user", text: input },
-      { type: "ai", text: "" },
-    ]);
+    setMessages((prev) => [...prev, { type: "user", text: input }]);
     addAIMessage(input);
     setInput("");
   };
 
-  const startNewChat = () => {
-    if (messages.length > 0) {
-      const title = messages.find((m) => m.type === "user")?.text || "Chat";
-      setChatHistory((prev) => [...prev, { title, messages }]);
-    }
-    setMessages([]);
-    setActiveChatIndex(null);
-  };
-
-  const loadChat = (index) => {
-    setMessages(chatHistory[index].messages);
-    setActiveChatIndex(index);
-  };
-
-  const openSidebar = () => {
-    setIsVisible(true);
-    setIsOpen(true);
-  };
-  const closeSidebar = () => {
-    if (fullPage) return; // full page mode can't close
-    setIsOpen(false);
-    setTimeout(() => setIsVisible(false), 300);
-  };
-
   return (
-    <div className={darkMode ? "dark" : ""}>
-      {/* Floating Button (only when not fullPage) */}
+    <div className="font-sans">
       {!fullPage && !isVisible && (
         <button
-          onClick={openSidebar}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-red-600 text-white shadow-lg hover:bg-red-700 transition-transform transform hover:scale-105"
+          onClick={() => {
+            setIsVisible(true);
+            setIsOpen(true);
+          }}
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3 rounded-full 
+          bg-gradient-to-r from-pink-500 via-red-500 to-pink-600 text-white shadow-xl 
+          hover:scale-105 transition-transform duration-200 group"
         >
-          <MessageCircle className="h-6 w-6" />
-          <span className="font-medium">AI Assistant</span>
+          <Sparkles className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+          <span className="font-semibold text-sm">AI Assistant</span>
         </button>
       )}
 
-      {/* FullPage Mode OR Sidebar Mode */}
       {(fullPage || isVisible) && (
         <div
           className={`${fullPage
             ? "fixed inset-0 z-40 flex bg-white dark:bg-gray-900"
-            : `fixed inset-0 z-50 flex justify-end items-end bg-black/40 transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"
+            : `fixed inset-0 z-50 flex justify-end items-end transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"
             }`
             }`}
-          onClick={!fullPage ? closeSidebar : undefined}
+          onClick={!fullPage ? () => { setIsOpen(false); setTimeout(() => setIsVisible(false), 300); } : undefined}
         >
           <div
             style={{
               width: fullPage ? "100%" : isMobile ? "100%" : sidebarWidth,
               height: fullPage ? "100%" : isMobile ? "100%" : sidebarHeight,
             }}
-            className={`relative flex flex-col bg-white dark:bg-gray-900 shadow-xl ${fullPage ? "rounded-none" : isMobile ? "rounded-none" : "rounded-2xl"
-              } transform transition-transform duration-300 ${fullPage ? "" : isOpen ? "translate-x-0" : "translate-x-full"
-              }`}
+            className={`relative flex flex-col bg-white/50 dark:bg-gray-950/30 shadow-2xl backdrop-blur-md overflow-hidden ${fullPage ? "" : isMobile ? "rounded-t-3xl" : "rounded-tl-3xl border-l border-t border-pink-100 dark:border-pink-800/50"
+              } transform transition-transform duration-300 ${fullPage ? "" : isOpen ? "translate-x-0" : "translate-x-full"}`}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Desktop Resizers (not in fullPage or mobile) */}
+            {/* Resizers */}
             {!isMobile && !fullPage && (
               <>
-                <div
-                  ref={rightResizerRef}
-                  onMouseDown={startHorizontalResize}
-                  className="absolute top-0 left-0 h-full w-2 cursor-ew-resize z-50"
-                />
-                <div
-                  ref={topResizerRef}
-                  onMouseDown={startVerticalResize}
-                  className="absolute top-0 left-0 w-full h-3 cursor-ns-resize z-50"
-                />
+                <div ref={leftResizerRef} onMouseDown={(e) => startResize(leftResizerRef, e)} className="absolute top-0 left-0 h-full w-2 cursor-ew-resize z-50 hover:bg-pink-400/20" />
+                <div ref={rightResizerRef} onMouseDown={(e) => startResize(rightResizerRef, e)} className="absolute top-0 right-0 h-full w-2 cursor-ew-resize z-50 hover:bg-pink-400/20" />
+                <div ref={topResizerRef} onMouseDown={(e) => startResize(topResizerRef, e)} className="absolute top-0 left-0 w-full h-2 cursor-ns-resize z-50 hover:bg-pink-400/20" />
               </>
             )}
 
-            {/* Content */}
-            <div className={`flex ${isMobile ? "flex-col" : "flex-row"} h-full`}>
-              {/* History Sidebar */}
-              {isHistoryOpen ? (
-                <div
-                  className={`border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300
-      ${fullPage
-                      ? "w-full sm:w-1/3 md:w-1/4 lg:w-1/5 min-w-[140px]" // Full on mobile, smaller on larger screens
-                      : "w-full sm:w-1/2 md:w-1/3 min-w-[160px]"}         // Wider when not fullPage
-    `}
-                >
-                  {/* Header */}
-                  <div className="flex flex-col border-b border-red-600">
-                    <div className="flex items-center justify-between p-4">
-                      <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">
-                        History
-                      </h2>
-                      <button
-                        onClick={() => setIsHistoryOpen(false)}
-                        className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
-                      >
-                        <ChevronLeft className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-                      </button>
-                    </div>
-                    <div className="h-0.5 bg-red-600 w-full"></div>
-                  </div>
-
-                  {/* New Chat button */}
-                  <button
-                    onClick={startNewChat}
-                    className="flex items-center gap-2 m-2 px-4 py-2 rounded-md bg-red-600 text-white font-medium hover:bg-red-700 transition-colors"
-                  >
-                    <Plus className="h-4 w-4" /> New Chat
-                  </button>
-
-                  {/* Chat list */}
-                  <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                    {chatHistory.map((chat, idx) => (
-                      <div
-                        key={idx}
-                        onClick={() => loadChat(idx)}
-                        className={`p-2 rounded-md cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 ${activeChatIndex === idx
-                            ? "bg-red-100 dark:bg-red-900/30"
-                            : "bg-gray-100 dark:bg-gray-800"
-                          }`}
-                      >
-                        <span className="text-gray-800 dark:text-gray-200">
-                          {chat.title.length > 30 ? chat.title.slice(0, 30) + "..." : chat.title}
-                        </span>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                          {chat.messages[chat.messages.length - 1]?.text || ""}
-                        </div>
-                      </div>
-                    ))}
+            {/* Header */}
+            <div className="px-6 py-4 bg-pink-50/70 dark:bg-pink-900/30 border-b border-pink-100 dark:border-pink-900/40 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-pink-500 to-red-500 flex items-center justify-center shadow-md shadow-pink-200 dark:shadow-none">
+                  <Sparkles className="text-white h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-pink-700 dark:text-pink-300 uppercase tracking-wider">AI Assistant</h2>
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                    <span className="text-[10px] text-pink-500/80 font-medium">Online & Ready</span>
                   </div>
                 </div>
-              ) : (
-                <div className="flex md:flex-col items-center gap-4 p-2 bg-red-50 dark:bg-gray-800 border-r border-red-600 shadow-lg md:rounded-l-xl">
-                  {/* Toggle open button */}
-                  <button
-                    onClick={() => setIsHistoryOpen(true)}
-                    className="flex items-center justify-center w-12 h-12 rounded-r"
-                    title="Open History"
-                  >
-                    <img src="../Logo/main.png" alt="" />
-                  </button>
+              </div>
+              {!fullPage && (
+                <button onClick={() => { setIsOpen(false); setTimeout(() => setIsVisible(false), 300); }} className="p-2 rounded-full text-pink-400 hover:bg-pink-100 dark:hover:bg-pink-900/50 transition-colors">
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
 
-                  {/* New Chat button */}
-                  <button
-                    onClick={startNewChat}
-                    className="flex items-center justify-center w-10 h-10 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-all"
-                    title="New Chat"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
+            {/* Chat Body */}
+            <div ref={containerRef} className="flex-1 overflow-y-auto scrollbar-hidden p-6 space-y-6 bg-white/10 dark:bg-gray-950/20 backdrop-blur-sm">
+              {messages.length === 0 && (
+                <div className="h-full flex flex-col items-center justify-center text-center opacity-60">
+                  <div className="w-20 h-20 bg-pink-50/50 dark:bg-pink-900/20 rounded-full flex items-center justify-center mb-4">
+                    <MessageCircle className="h-10 w-10 text-pink-400" />
+                  </div>
+                  <h3 className="text-pink-600 dark:text-pink-400 font-semibold">How can I assist you?</h3>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 max-w-[200px]">Ask me anything or try a suggestion below.</p>
                 </div>
               )}
 
+              {messages.map((msg, idx) => (
+                <div key={idx} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
+                  {msg.type === "ai" ? (
+                    <aside className="w-full max-w-[90%] bg-pink-50/70 dark:bg-pink-900/30 border border-pink-200 dark:border-pink-700 rounded-2xl shadow-sm p-4">
+                      {/* Header with AI label */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[10px] font-bold text-pink-600 dark:text-pink-300 uppercase tracking-widest bg-white/70 dark:bg-pink-800/50 px-2 py-0.5 rounded border border-pink-100 dark:border-pink-600">
+                          AI
+                        </span>
 
-              {/* Chat Panel */}
-              <div className="flex flex-col flex-1 p-4 relative">
-                <div className="flex flex-col mb-3">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold text-red-600 dark:text-red-400">
-                      AI Assistant
-                    </h2>
-                    {!fullPage && (
-                      <button
-                        onClick={closeSidebar}
-                        className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-                      >
-                        <X className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-                      </button>
-                    )}
-                  </div>
-                  <div className="h-0.5 bg-red-600 w-full mt-2"></div>
-                </div>
+                        {/* Show either Loading OR Error */}
+                        {!msg.loading && msg.error && <span className="text-xs text-red-500">{msg.error}</span>}
+                      </div>
 
-                {/* Messages */}
-                <div
-                  ref={containerRef}
-                  className="flex-1 overflow-y-auto mb-3 space-y-2"
-                >
-                  {messages.map((msg, idx) => (
-                    <div
-                      key={idx}
-                      className={`p-2 rounded-2xl max-w-full break-words shadow-md ${msg.type === "user"
-                        ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 self-end ml-auto"
-                        : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200"
-                        }`}
-                    >
-                      {msg.text ||
-                        (msg.type === "ai" && typing ? (
-                          <span className="animate-pulse">|</span>
-                        ) : (
-                          ""
-                        ))}
+                      {/* AI Message Body */}
+                      <div className="text-sm leading-relaxed text-gray-700 dark:text-pink-100">
+                        {!msg.loading && !msg.error && msg.text}
+                        {msg.loading && (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-t-pink-500 border-gray-300 rounded-full animate-spin"></div>
+                            <span>Generating response...</span>
+                          </div>
+                        )}
+                      </div>
+                    </aside>
+                  ) : (
+                    <div className="max-w-[80%] bg-gradient-to-r from-pink-500 to-red-500 text-white p-3.5 rounded-2xl rounded-tr-none shadow-lg shadow-pink-200 dark:shadow-none text-sm font-medium">
+                      {msg.text}
                     </div>
-                  ))}
+                  )}
                 </div>
+              ))}
 
-                {/* Input */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask AI..."
-                    className="flex-1 rounded-xl border border-gray-300 dark:border-gray-600 px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500"
-                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                  />
-                  <button
-                    onClick={handleSend}
-                    className="rounded-md bg-red-600 px-4 py-2 text-white font-semibold hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Send
-                  </button>
-                </div>
+
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-pink-50 dark:border-pink-900/30 bg-white/10 dark:bg-gray-950/30 backdrop-blur-sm">
+              <div className="relative flex items-center gap-2 bg-gray-50/30 dark:bg-pink-900/10 border border-pink-100 dark:border-pink-900/50 p-2 rounded-2xl focus-within:ring-2 ring-pink-500/20 transition-all">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { handleSend(); } }}
+                  placeholder="Ask me anything..."
+                  className="flex-1 bg-transparent border-none px-3 py-2 text-sm text-gray-800 dark:text-pink-50 focus:outline-none placeholder:text-pink-300 dark:placeholder:text-pink-700"
+                />
+                <button
+                  onClick={() => { handleSend(); }}
+                  disabled={!input.trim() || typing}
+                  className="p-2.5 rounded-xl bg-gradient-to-r from-pink-500 via-red-500 to-pink-600 text-white shadow-md hover:brightness-110 disabled:opacity-40 disabled:grayscale transition-all"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
               </div>
+              <p className="text-[10px] text-center text-pink-300 mt-2 font-medium">Powered by QuickPost using Gemini</p>
             </div>
           </div>
         </div>
@@ -335,3 +330,5 @@ export default function AIAssistantSidebar({ fullPage = false }) {
     </div>
   );
 }
+
+

@@ -46,45 +46,83 @@ export class Ai_function {
         }
     }
     async aiMetaDataGenerator({ title, shortDescription, keywords, content }) {
-    try {
-        const execution = await this.function.createExecution(
-            env.APPWRITE_FUNCTION_AITOOL,
-            JSON.stringify({
-                title,
-                shortDescription,
-                keywords,
-                content,
-            }),
-            false,
-            "/ai-metadata-generator",
-            ExecutionMethod.POST,
-            {
-                "Content-Type": "application/json",
+        try {
+            const execution = await this.function.createExecution(
+                env.APPWRITE_FUNCTION_AITOOL,
+                JSON.stringify({
+                    title,
+                    shortDescription,
+                    keywords,
+                    content,
+                }),
+                false,
+                "/ai-metadata-generator",
+                ExecutionMethod.POST,
+                {
+                    "Content-Type": "application/json",
+                }
+            );
+
+            console.log(execution);
+
+            const res = JSON.parse(execution?.responseBody);
+
+            if (res?.success) {
+                return {
+                    success: true,
+                    metaDataResult: res.metaDataResult,
+                };
             }
-        );
 
-        console.log(execution);
-
-        const res = JSON.parse(execution?.responseBody);
-
-        if (res?.success) {
             return {
-                success: true,
-                metaDataResult: res.metaDataResult,
+                success: false,
+                error: res?.error || "Metadata generation failed",
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message || "Unexpected error",
             };
         }
-
-        return {
-            success: false,
-            error: res?.error || "Metadata generation failed",
-        };
-    } catch (error) {
-        return {
-            success: false,
-            error: error.message || "Unexpected error",
-        };
     }
-}
+    async aiChat({ userQuery, userContext }) {
+        try {
+            const execution = await this.function.createExecution(
+                env.APPWRITE_FUNCTION_AITOOL,
+                JSON.stringify({
+                    userQuery, userContext
+                }),
+                false,
+                "/chat",
+                ExecutionMethod.POST,
+                {
+                    "Content-Type": "application/json",
+                }
+            );
+
+            console.log(execution);
+
+            const res = JSON.parse(execution?.responseBody);
+
+            if (res?.success) {
+                return {
+                    success: true,
+                    reply:res?.reply
+                };
+            }
+
+            return {
+                success: false,
+                error: res?.error || "Metadata generation failed",
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.message || "Unexpected error",
+            };
+        }
+    }
+
 
 }
 

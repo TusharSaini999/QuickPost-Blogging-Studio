@@ -3,7 +3,7 @@ import { Plus, FileText, CheckCircle2, FileEdit, Lock, Unlock } from "lucide-rea
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import ActionButton from "./ActionButton";
 import KpiCard from "./KpiCard";
-import AIAssistant from "./AIAssistant";
+import AIAssistantSidebar from "./AIAssistant";
 import { Link as RouteLink } from "react-router";
 
 function getLast4WeeksWithEmptyBars(weekPrefs) {
@@ -94,8 +94,7 @@ export default function DashboardOverview({
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
-        <AIAssistant />
-
+        <AIAssistantSidebar fullPage={false} page={"Dashboard"} AICall={()=>{}} />
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
           <KpiCard title="Total Posts" value={stats.total} icon={<FileText className="h-6 w-6" />} tooltip="All posts you’ve created" />
           <KpiCard title="Published" value={stats.published} icon={<CheckCircle2 className="h-6 w-6" />} tooltip="Live posts visible to everyone" />
