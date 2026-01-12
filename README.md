@@ -1,54 +1,70 @@
 # 📝 QuickPost Blogging Studio
 
-PostApp is a **modern, full‑featured blogging platform** built with **React, Vite, and Appwrite**. It enables users to create, manage, and publish blog content through a fast, secure, and responsive interface.
+**QuickPost** is a modern, full-featured blogging platform built with **React, Vite, and Appwrite**, designed for fast, secure, and AI-assisted content creation and management.
 
 ---
 
 ## ✨ Highlights
 
-* ⚡ Fast performance with Vite + React
-* 🔐 Secure authentication using Appwrite
-* 🖋️ Rich text editing with TinyMCE
-* 🌙 Light / Dark mode support
-* 📱 Fully responsive design
-* 🤖 AI‑assisted content creation
+* ⚡ Fast performance with **Vite + React**
+* 🔐 Secure authentication using **Appwrite**
+* 🖋️ Rich text editing with **TinyMCE**
+* 🌙 Light & Dark mode support
+* 📱 Fully responsive, mobile-first design
+* 🤖 AI-assisted content creation
+* 📊 Analytics-ready dashboard
+* 🔄 Real-time data synchronization
 
 ---
 
 ## 🚀 Features
 
-* **Authentication**
+### 🔐 Authentication
 
-  * Email & password login/signup
-  * Secure sessions and email verification
+* Email & password signup / login
+* Secure sessions with Appwrite
+* Email verification & session handling
 
-* **Post Management**
+### 📝 Post Management
 
-  * Create, edit, delete, and publish posts
-  * Public, private, and draft visibility
+* Create, edit, delete, and publish posts
+* Public, private, and draft visibility
+* Auto-save drafts while writing
+* Media uploads (images & assets)
 
-* **Rich Text Editor**
+### ✍️ Rich Text Editor
 
-  * TinyMCE‑powered editor
-  * Media, formatting, and links support
+* TinyMCE-powered editor
+* Formatting, links, images, and embeds
+* Markdown-friendly content support
 
-* **Dashboard**
+### 📊 Dashboard
 
-  * Manage posts and view activity
-  * Quick publish and edit actions
+* Centralized post management
+* Quick publish, edit, and delete actions
+* Post activity overview
 
-* **Profile Management**
+### 👤 Profile Management
 
-  * Update user profile details
+* Update profile details
+* Manage account settings
 
-* **UI & UX**
+### 🤖 AI Assistance (New)
 
-  * Clean interface with Tailwind CSS
-  * Mobile‑first responsive layout
+* AI-powered content suggestions
+* Post title & summary generation
+* Writing assistance inside the editor
 
-* **Real‑Time Updates**
+### 🎨 UI & UX
 
-  * Live synchronization using Appwrite
+* Clean, modern interface with Tailwind CSS
+* Light / Dark mode toggle
+* Fully responsive layout
+
+### 🔄 Real-Time Updates
+
+* Live data synchronization using Appwrite
+* Instant UI updates without refresh
 
 ---
 
@@ -64,101 +80,83 @@ PostApp is a **modern, full‑featured blogging platform** built with **React, V
 
 ### Backend & Services
 
-* Appwrite (Authentication, Database, Storage)
+* Appwrite
+
+  * Authentication
+  * Database
+  * Storage
+  * Real-time API
 
 ### Tools & Libraries
 
 * TinyMCE – Rich text editor
 * Lucide React – Icons
-* Recharts – Charts
+* Recharts – Charts & analytics
 
 ---
 
 ## 📋 Prerequisites
 
-* Node.js v16 or higher
+* Node.js **v16 or higher**
 * npm or yarn
-* Appwrite (Cloud or Self‑Hosted)
+* Appwrite (Cloud or Self-Hosted)
 
 ---
 
-## 🚀 Getting Started
-
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/TusharSaini999/QuickPost-Blogging-Studio.git
-```
-
-### 2️⃣ Install Dependencies
-
-```bash
-npm install
-```
-
-### 3️⃣ Environment Setup
-
-Configure your Appwrite project credentials in the environment files.
-
-### 4️⃣ Start Development Server
-
-```bash
-npm run dev
-```
-
-### 5️⃣ Build for Production
-
-```bash
-npm run build
-npm run preview
-```
-
----
-
-## 🧱 Project Architecture (Graphic)
+## 🧱 Application Architecture
 
 ```text
 User
  │
- │  HTTP Requests
+ │ HTTP Requests
  ▼
 Frontend (React + Vite)
- │  ├─ UI Components (Tailwind CSS)
- │  ├─ State Management (Redux Toolkit)
- │  └─ Routing (React Router)
+ │ ├─ UI Components (Tailwind CSS)
+ │ ├─ State Management (Redux Toolkit)
+ │ └─ Routing (React Router)
  │
  ▼
 Backend (Appwrite)
- │  ├─ Authentication
- │  ├─ Database (Posts, Users)
- │  └─ Storage (Images, Media)
+ │ ├─ Authentication
+ │ ├─ Database (Posts, Users)
+ │ └─ Storage (Images, Media)
  │
  ▼
 Real-Time Sync & API Responses
 ```
 
-> 📌 This diagram represents the high-level working flow of **PostApp**, showing how the frontend communicates with Appwrite services.
-
 ---
 
-## 🌳 Project Folder Tree Structure
+## 🌳 Project Folder Structure
 
 ```
-postapp/
-├── src/
-│   ├── Appwrite/        # Appwrite service configuration
-│   ├── Component/       # Reusable UI components
-│   ├── Configenv/       # Environment variables
-│   ├── Editor/          # Rich text editor logic
-│   ├── Feature/         # Redux slices (state management)
-│   ├── Pages/           # Application pages
-│   └── Store/           # Redux store setup
-│
-├── public/              # Static assets
-├── Document/            # Project documentation
-├── Logo/                # Logos & manifest files
-├── dist/                # Production build output
-└── README.md            # Project documentation
+PostApp/
+├── Functions/
+│   ├── ai-tools/         # AI utilities (chat, metadata, summaries)
+│   └── contact-email/    # Email handling function
+└── Web/                  # Frontend (React + Vite)
+    ├── .env
+    ├── .env.example
+    ├── .gitignore
+    ├── client_secret.json
+    ├── eslint.config.js
+    ├── index.html
+    ├── Logo/
+    │   └── site.webmanifest
+    ├── node_modules/
+    ├── package-lock.json
+    ├── package.json
+    └── src/
+        ├── App.jsx
+        ├── index.css
+        ├── main.jsx
+        ├── Appwrite/       # Appwrite service logic
+        ├── Component/      # Reusable UI components
+        ├── Configenv/      # Environment config
+        ├── Editor/         # TinyMCE editor integration
+        ├── Feature/        # Redux slices
+        ├── Pages/          # Application pages
+        └── Store/          # Redux store setup
 ```
 
 ---
@@ -177,21 +175,10 @@ postapp/
 ## 🌐 Appwrite Setup
 
 1. Create a project in Appwrite
-2. Enable Email/Password authentication
-3. Create databases for posts and users
+2. Enable Email / Password authentication
+3. Create collections for **Users** and **Posts**
 4. Configure storage for media uploads
 5. Update environment credentials
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the repository
-2. Create a new branch
-3. Commit your changes
-4. Push and open a Pull Request
 
 ---
 

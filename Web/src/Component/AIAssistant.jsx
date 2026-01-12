@@ -172,7 +172,7 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
       //     updated[messageIndex] = { type: "ai", text: aiResponse, loading: false, error: "" };
       //     return updated;
       //   });
-      
+
       for (let i = 0; i < aiResponse.length; i++) {
         displayText += aiResponse[i];
         setMessages((prev) => {
@@ -292,14 +292,14 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
                       </div>
 
                       {/* AI Message Body */}
-                      <div className="text-sm leading-relaxed text-gray-700 dark:text-pink-100 overflow-hidden">
+                      <div className="prose prose-sm max-w-none text-gray-700 dark:prose-invert dark:text-pink-100 overflow-hidden">
                         {!msg.loading && !msg.error && (
                           <ReactMarkdown
-                        remarkPlugins={[remarkGfm]}
-                        rehypePlugins={[rehypeRaw, rehypeSanitize]}
-                      >
-                        {msg.text}
-                      </ReactMarkdown>
+                            remarkPlugins={[remarkGfm]}
+                            rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                          >
+                            {msg.text}
+                          </ReactMarkdown>
                         )}
                         {msg.loading && (
                           <div className="flex items-center gap-2">
@@ -311,7 +311,7 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
                     </aside>
                   ) : (
                     <div className="max-w-[80%] bg-gradient-to-r from-pink-500 to-red-500 text-white p-3.5 rounded-2xl rounded-tr-none shadow-lg shadow-pink-200 dark:shadow-none text-sm font-medium">
-                        {msg.text}
+                      {msg.text}
                     </div>
                   )}
                 </div>
@@ -339,7 +339,7 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
                   <Send className="h-4 w-4" />
                 </button>
               </div>
-              <p className="text-[10px] text-center text-pink-300 mt-2 font-medium">Powered by QuickPost using Gemini</p>
+              <p className="text-[10px] text-center text-pink-300 mt-2 font-medium">Powered by QuickPost using ChatGPT</p>
             </div>
           </div>
         </div>
