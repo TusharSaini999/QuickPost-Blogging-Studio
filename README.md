@@ -141,7 +141,7 @@ PostApp/
     ├── client_secret.json
     ├── eslint.config.js
     ├── index.html
-    ├── Logo/
+    ├── /Logo/
     │   └── site.webmanifest
     ├── node_modules/
     ├── package-lock.json

@@ -25,7 +25,7 @@ const Hero = () => (
       {/* Hero Image */}
       <div className="w-full md:w-1/2 flex justify-center md:justify-end">
         <img
-          src="/public/Logo/HeroMain.webp"
+          src="//Logo/HeroMain.webp"
           alt="Woman posting on computer"
           className="w-full max-w-[500px] md:max-w-full h-auto drop-shadow-xl object-contain"
         />
