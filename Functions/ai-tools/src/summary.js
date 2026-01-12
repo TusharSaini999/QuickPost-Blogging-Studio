@@ -1,5 +1,5 @@
 import Groq from "groq-sdk";
-const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const lengthMap = {
   Short: "in 2–3 concise sentences",
   Medium: "in 4–6 well-structured sentences",
