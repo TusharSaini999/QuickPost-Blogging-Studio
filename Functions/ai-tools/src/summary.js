@@ -40,23 +40,24 @@ export async function summaryAI({ req, res, log, error }) {
     const { title = "", shortDescription = "", content, length = "Medium" } = body;
 
     if (!content || content.trim().length < 50) {
-      return res.status(400).json({ success: false, error: "Content must be at least 50 characters" });
+      return res.status(400).json({
+        success: false,
+        error: "Content must be at least 50 characters",
+      });
     }
 
-    // Initialize Groq client
-    
+    const prompt = buildPrompt({ title, shortDescription, content, length });
 
-    // Make request to GPT-OSS-120B
-    const response = await client.chat.completions.create({
+    // Non-streaming Groq call
+    const response = await groq.chat.completions.create({
       model: process.env.LLM_MODEL || "openai/gpt-oss-120b",
-      messages: [
-        {
-          role: "user",
-          content: buildPrompt({ title, shortDescription, content, length })
-        }
-      ],
+      messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
-      max_output_tokens: 2000
+      max_completion_tokens: 2000, // ✅ correct property
+      top_p: 1,
+      stream: false,              // non-streaming
+      reasoning_effort: "medium",
+      stop: null
     });
 
     const summary = response.choices?.[0]?.message?.content?.trim();
@@ -64,10 +65,15 @@ export async function summaryAI({ req, res, log, error }) {
 
     log("Summary generated successfully");
 
-    return res.json({ success: true, summary });
+    return res.status(200).json({ success: true, summary });
+
   } catch (err) {
     error("Summary AI Error: " + err.message);
-    return res.status(500).json({ success: false, error: err.message });
+    return res.status(500).json({
+      success: false,
+      error: err.message,
+    });
   }
 }
+
 
