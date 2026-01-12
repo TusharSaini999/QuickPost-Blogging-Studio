@@ -84,7 +84,7 @@ const Header = () => {
               (
                 <ScroolLink className="flex items-center cursor-pointer" to="Hero" smooth={true} duration={500} onClick={() => handelActive("Home")}>
                   <img
-                    src={theam ? "//Logo/Darklogo.png" : "//Logo/lightlogo.png"}
+                    src={theam ? "/Logo/Darklogo.png" : "/Logo/lightlogo.png"}
                     alt="Logo"
                     className="w-28 sm:w-32 md:w-35 lg:w-38 h-auto"
                   />
@@ -92,7 +92,7 @@ const Header = () => {
               ) : (
                 <RouteLink onClick={() => (setMobileMenuOpen(false))} className="flex items-center cursor-pointer" to="/dashboard">
                   <img
-                    src={theam ? "//Logo/Darklogo.png" : "//Logo/lightlogo.png"}
+                    src={theam ? "/Logo/Darklogo.png" : "/Logo/lightlogo.png"}
                     alt="Logo"
                     className="w-28 sm:w-32 md:w-35 lg:w-38 h-auto"
                   />
