@@ -36,44 +36,49 @@ ${content}
 
 export async function summaryAI({ req, res, log, error }) {
   try {
+    // Parse request body
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
     const { title = "", shortDescription = "", content, length = "Medium" } = body;
 
+    // Validate content length
     if (!content || content.trim().length < 50) {
-      return res.status(400).json({
+      // Return JSON like Gemini version, without res.status
+      return res.json({
         success: false,
         error: "Content must be at least 50 characters",
-      });
+      }, 400);
     }
 
+    // Build prompt for Groq
     const prompt = buildPrompt({ title, shortDescription, content, length });
 
-    // Non-streaming Groq call
+    // Call Groq API (non-streaming)
     const response = await groq.chat.completions.create({
       model: process.env.LLM_MODEL || "openai/gpt-oss-120b",
       messages: [{ role: "user", content: prompt }],
       temperature: 0.7,
-      max_completion_tokens: 2000, // ✅ correct property
+      max_completion_tokens: 2000,
       top_p: 1,
-      stream: false,              // non-streaming
-      reasoning_effort: "medium",
-      stop: null
+      stream: false,
+      reasoning_effort: "medium"
     });
 
     const summary = response.choices?.[0]?.message?.content?.trim();
-    if (!summary) throw new Error("Empty AI response");
+
+    if (!summary) {
+      throw new Error("Empty AI response");
+    }
 
     log("Summary generated successfully");
 
-    return res.status(200).json({ success: true, summary });
+    // Return same style as Gemini
+    return res.json({ success: true, summary });
 
   } catch (err) {
     error("Summary AI Error: " + err.message);
-    return res.status(500).json({
+    return res.json({
       success: false,
       error: err.message,
-    });
+    }, 500);
   }
 }
-
-
