@@ -7,7 +7,7 @@ const About = () => {
             <div className="py-16 px-6 max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
                 <div className="w-full md:w-1/2">
                     <img
-                        src="/Logo/About.webp"
+                        src="/public/Logo/About.webp"
                         alt="About Quick Post Illustration"
                         className="w-full h-auto dark:shadow-gray-900"
                     />

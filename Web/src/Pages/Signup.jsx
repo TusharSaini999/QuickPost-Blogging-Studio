@@ -68,7 +68,7 @@ const Signup = () => {
         {/* Left Side - Image */}
         <div className="hidden md:block md:w-1/2">
           <img
-            src="Logo/Signup.png"
+            src="public/Logo/Signup.png"
             alt="Signup Illustration"
             className="h-full w-full object-cover"
           />
