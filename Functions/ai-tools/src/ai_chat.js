@@ -187,7 +187,7 @@ export async function chatAI({ req, res, log, error }) {
     } catch (err) {
         error("Chat AI Error: " + err.message);
         return res.json(
-            { success: false, error: err.message },
+            { success: false, error: "The AI chat engine is currently unavailable. Please try again later." },
             500
         );
     }
