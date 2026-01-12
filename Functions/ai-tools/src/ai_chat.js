@@ -51,11 +51,18 @@ Quick Links: ${quickLinks?.join(", ") || ""}
         const { currentPost, coverImage, formFields } = userContext;
         pageContext = `
 Current Page: ${currentPage}
-Post Title: ${currentPost?.title || ""}
-Short Description: ${currentPost?.shortDescription || ""}
-Keywords: ${currentPost?.keywords?.join(", ") || ""}
-Content: ${currentPost?.content || ""}
-
+Current Post Title: ${currentPost?.title || ""}
+Current Short Description: ${currentPost?.shortDescription || ""}
+Current Keywords: ${currentPost?.keywords?.join(", ") || ""}
+Current Content: ${currentPost?.content || ""}
+Instructions for AI:
+- Use the above post data as the main context.
+- If the user requests, generate additional related content based on the current post.
+- Ensure any generated content is consistent with the existing title, short description, keywords, and content.
+- Enhance, expand, or provide examples without removing valid existing data.
+- Keep the style suitable for a modern blogging platform.
+- Do not hallucinate facts or add unrelated content.
+- Output plain text only.
 Cover Image:
   Enabled: ${coverImage?.enabled}
   Optional: ${coverImage?.optional}
