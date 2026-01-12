@@ -15,7 +15,7 @@
     "@tailwindcss/vite": "^4.1.11",
     "@tinymce/tinymce-react": "^6.3.0",
     "appwrite": "^18.2.0",
-    "canvas": "^3.1.2",
+    "canvas": "^3.2.1",
     "html-react-parser": "^5.2.6",
     "html-to-text": "^9.0.5",
     "lucide-react": "^0.525.0",
