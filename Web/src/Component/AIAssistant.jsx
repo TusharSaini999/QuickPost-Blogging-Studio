@@ -167,21 +167,21 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
       const aiResponse = await aiCall({ userQuery: userMessage, userContext: Data });
       console.log("AI responce Come here", aiResponse);
       let displayText = "";
-      setMessages((prev) => {
-          const updated = [...prev];
-          updated[messageIndex] = { type: "ai", text: aiResponse, loading: false, error: "" };
-          return updated;
-        });
-      
-      // for (let i = 0; i < aiResponse.length; i++) {
-      //   displayText += aiResponse[i];
-      //   setMessages((prev) => {
+      // setMessages((prev) => {
       //     const updated = [...prev];
-      //     updated[messageIndex] = { type: "ai", text: displayText, loading: false, error: "" };
+      //     updated[messageIndex] = { type: "ai", text: aiResponse, loading: false, error: "" };
       //     return updated;
       //   });
-      //   await new Promise((r) => setTimeout(r, 10));
-      // }
+      
+      for (let i = 0; i < aiResponse.length; i++) {
+        displayText += aiResponse[i];
+        setMessages((prev) => {
+          const updated = [...prev];
+          updated[messageIndex] = { type: "ai", text: displayText, loading: false, error: "" };
+          return updated;
+        });
+        await new Promise((r) => setTimeout(r, 10));
+      }
     } catch (err) {
       setMessages((prev) => {
         const updated = [...prev];
@@ -292,7 +292,7 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
                       </div>
 
                       {/* AI Message Body */}
-                      <div className="text-sm leading-relaxed text-gray-700 dark:text-pink-100">
+                      <div className="text-sm leading-relaxed text-gray-700 dark:text-pink-100 overflow-hidden">
                         {!msg.loading && !msg.error && (
                           <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
