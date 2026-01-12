@@ -17,7 +17,7 @@ Response guidelines:
 - Use simple, natural, human-like language
 - Do not make assumptions beyond the given context
 - Do not hallucinate facts or features
-- When generating content for TinyMCE, output plain text or Markdown only. Do not generate HTML.
+- When generating content for TinyMCE, output plain text. Do not generate HTML.
 `;
 }
 
