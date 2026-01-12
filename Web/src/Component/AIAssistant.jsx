@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { MessageCircle, X, Send, Sparkles } from "lucide-react";
 import { useSelector } from "react-redux";
 import ai_function from "../Appwrite/ai_function";
-
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
 export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard", AICall }) {
   // Chat state
   const [isOpen, setIsOpen] = useState(fullPage);
@@ -162,16 +165,23 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
 
     try {
       const aiResponse = await aiCall({ userQuery: userMessage, userContext: Data });
+      console.log("AI responce Come here", aiResponse);
       let displayText = "";
-      for (let i = 0; i < aiResponse.length; i++) {
-        displayText += aiResponse[i];
-        setMessages((prev) => {
+      setMessages((prev) => {
           const updated = [...prev];
-          updated[messageIndex] = { type: "ai", text: displayText, loading: false, error: "" };
+          updated[messageIndex] = { type: "ai", text: aiResponse, loading: false, error: "" };
           return updated;
         });
-        await new Promise((r) => setTimeout(r, 10));
-      }
+      
+      // for (let i = 0; i < aiResponse.length; i++) {
+      //   displayText += aiResponse[i];
+      //   setMessages((prev) => {
+      //     const updated = [...prev];
+      //     updated[messageIndex] = { type: "ai", text: displayText, loading: false, error: "" };
+      //     return updated;
+      //   });
+      //   await new Promise((r) => setTimeout(r, 10));
+      // }
     } catch (err) {
       setMessages((prev) => {
         const updated = [...prev];
@@ -283,7 +293,14 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
 
                       {/* AI Message Body */}
                       <div className="text-sm leading-relaxed text-gray-700 dark:text-pink-100">
-                        {!msg.loading && !msg.error && msg.text}
+                        {!msg.loading && !msg.error && (
+                          <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                      >
+                        {msg.text}
+                      </ReactMarkdown>
+                        )}
                         {msg.loading && (
                           <div className="flex items-center gap-2">
                             <div className="w-4 h-4 border-2 border-t-pink-500 border-gray-300 rounded-full animate-spin"></div>
@@ -294,7 +311,7 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
                     </aside>
                   ) : (
                     <div className="max-w-[80%] bg-gradient-to-r from-pink-500 to-red-500 text-white p-3.5 rounded-2xl rounded-tr-none shadow-lg shadow-pink-200 dark:shadow-none text-sm font-medium">
-                      {msg.text}
+                        {msg.text}
                     </div>
                   )}
                 </div>

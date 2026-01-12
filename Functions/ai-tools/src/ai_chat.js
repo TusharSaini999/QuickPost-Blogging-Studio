@@ -15,6 +15,8 @@ Response guidelines:
 - Focus primarily on the current page context
 - Give clear, direct, and helpful answers
 - Use simple, natural, human-like language
+- Do not make assumptions beyond the given context
+- Do not hallucinate facts or features
 `;
 }
 

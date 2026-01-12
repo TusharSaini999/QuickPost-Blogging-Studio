@@ -22,10 +22,14 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.61.1",
+    "react-markdown": "^10.1.0",
     "react-redux": "^9.2.0",
     "react-router": "^7.7.1",
     "react-scroll": "^1.9.3",
     "recharts": "^3.1.2",
+    "rehype-raw": "^7.0.0",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "tinymce": "^8.0.2"
   },
   "devDependencies": {
