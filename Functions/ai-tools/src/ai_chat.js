@@ -15,11 +15,6 @@ Response guidelines:
 - Focus primarily on the current page context
 - Give clear, direct, and helpful answers
 - Use simple, natural, human-like language
-- Avoid unnecessary explanations
-- Do not make assumptions beyond the given context
-- Do not hallucinate facts or features
-- Do not use emojis, markdown, bullet points, or headings
-- Output plain text only
 `;
 }
 
@@ -62,8 +57,6 @@ Instructions for AI:
 - Ensure any generated content is consistent with the existing title, short description, keywords, and content.
 - Enhance, expand, or provide examples without removing valid existing data.
 - Keep the style suitable for a modern blogging platform.
-- Do not hallucinate facts or add unrelated content.
-- Output plain text only.
 Cover Image:
   Enabled: ${coverImage?.enabled}
   Optional: ${coverImage?.optional}
