@@ -141,8 +141,9 @@ PostApp/
     ├── client_secret.json
     ├── eslint.config.js
     ├── index.html
-    ├── Logo/
-    │   └── site.webmanifest
+    ├── public/
+    │   └── Logo/
+    │       └──site.webmanifest
     ├── node_modules/
     ├── package-lock.json
     ├── package.json
@@ -169,16 +170,6 @@ PostApp/
 | `npm run build`   | Build for production     |
 | `npm run preview` | Preview production build |
 | `npm run lint`    | Run ESLint               |
-
----
-
-## 🌐 Appwrite Setup
-
-1. Create a project in Appwrite
-2. Enable Email / Password authentication
-3. Create collections for **Users** and **Posts**
-4. Configure storage for media uploads
-5. Update environment credentials
 
 ---
 

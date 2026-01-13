@@ -145,7 +145,7 @@ export default async ({ req, res, log, error }) => {
 
                 <!-- CTA -->
                 <a
-                  href="#"
+                  href="https://quickpostai.vercel.app/"
                   style="
                     display:inline-block;
                     padding:14px 26px;
