@@ -33,7 +33,7 @@ function getLast4WeeksWithEmptyBars(weekPrefs) {
     let weekYear = currentYear;
 
     if (weekNum <= 0) {
-      weekNum += TOTAL_WEEKS; 
+      weekNum += TOTAL_WEEKS;
       weekYear -= 1;
     }
 
@@ -59,7 +59,6 @@ export default function DashboardOverview({
     "202536": 0
   }
 }) {
-
   const pieData = [
     { name: "Public", value: stats.public },
     { name: "Private", value: stats.private },
@@ -69,8 +68,6 @@ export default function DashboardOverview({
   const COLORS = ["#ef4444", "#f97316", "#3b82f6"];
 
   const barData = getLast4WeeksWithEmptyBars(week);
-  console.log(barData)
-
   return (
     <div className="min-h-screen w-full bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200">
       <header className="backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-900/60 border-b border-gray-200 dark:border-gray-800">
@@ -94,7 +91,7 @@ export default function DashboardOverview({
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
-        <AIAssistantSidebar fullPage={false} page={"Dashboard"} AICall={()=>{}} />
+        <AIAssistantSidebar fullPage={false} page={"Dashboard"} AICall={() => { }} />
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
           <KpiCard title="Total Posts" value={stats.total} icon={<FileText className="h-6 w-6" />} tooltip="All posts you’ve created" />
           <KpiCard title="Published" value={stats.published} icon={<CheckCircle2 className="h-6 w-6" />} tooltip="Live posts visible to everyone" />
