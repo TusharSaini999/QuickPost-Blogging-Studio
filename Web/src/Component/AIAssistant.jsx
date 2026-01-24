@@ -166,22 +166,22 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
     try {
       const aiResponse = await aiCall({ userQuery: userMessage, userContext: Data });
       console.log("AI responce Come here", aiResponse);
-      let displayText = "";
-      // setMessages((prev) => {
+      // let displayText = "";
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[messageIndex] = { type: "ai", text: aiResponse, loading: false, error: "" };
+        return updated;
+      });
+
+      // for (let i = 0; i < aiResponse.length; i++) {
+      //   displayText += aiResponse[i];
+      //   setMessages((prev) => {
       //     const updated = [...prev];
-      //     updated[messageIndex] = { type: "ai", text: aiResponse, loading: false, error: "" };
+      //     updated[messageIndex] = { type: "ai", text: displayText, loading: false, error: "" };
       //     return updated;
       //   });
-
-      for (let i = 0; i < aiResponse.length; i++) {
-        displayText += aiResponse[i];
-        setMessages((prev) => {
-          const updated = [...prev];
-          updated[messageIndex] = { type: "ai", text: displayText, loading: false, error: "" };
-          return updated;
-        });
-        await new Promise((r) => setTimeout(r, 10));
-      }
+      //   await new Promise((r) => setTimeout(r, 10));
+      // }
     } catch (err) {
       setMessages((prev) => {
         const updated = [...prev];
