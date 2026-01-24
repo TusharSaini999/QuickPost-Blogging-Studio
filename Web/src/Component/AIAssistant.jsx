@@ -145,7 +145,7 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
     if (page === "Dashboard") {
       Data = {
         ...Data,
-        dashboardSummary: { welcomeMessage: "Welcome back, Tushar Saini" },
+        dashboardSummary: { welcomeMessage: `Welcome back, ${userData?.name || "Here is User Name"}` },
         visibleSections: ["Top Navigation", "Dashboard Overview", "Post Statistics", "Quick Links", "Post Charts"],
         quickLinks: ["New Post", "All Posts", "My Public Post", "My Private Post", "Drafts Post", "All Public Post"],
         currentPageOnUser: "Dashboard",
