@@ -1,5 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { createPost, deletePost, updatePost } from './Post';
+import { createSlice,createAsyncThunk } from '@reduxjs/toolkit';
+import { createPost, deletePost, updatePost ,getPost} from './Post';
 
 const initialState = {
     status: false,
@@ -9,7 +9,18 @@ const initialState = {
     deletePrefs: null,
     editPrefs: null
 };
-
+export const loginAndFetchPosts = createAsyncThunk(
+  'Auth/loginAndFetchPosts',
+  async (userData, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(login(userData)); // update auth state
+      dispatch(getPost({ userId: userData.$id, defaults: true })).unwrap();
+      return userData;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 const AuthSlice = createSlice({
     name: 'Auth',
     initialState,

@@ -2,7 +2,7 @@ import Footer from "./Component/Footer.jsx";
 import Header from "./Component/Header.jsx"
 import { Outlet, useNavigate } from "react-router";
 import { useDispatch, useSelector } from 'react-redux';
-import { login, logout, updateName } from './Feature/Auth.js';
+import { loginAndFetchPosts ,logout, updateName } from './Feature/Auth.js';
 import authService from './Appwrite/auth.js';
 import Loader from "./Component/Loader.jsx";
 import { useLocation } from "react-router";
@@ -44,16 +44,14 @@ function App() {
         dispatch(setloading(true));
         const userData = await authService.checkUser();
         if (userData.success) {
-          dispatch(getPost({ userId: userData.user?.$id, defaults: true }));
-          console.log(post);
           if (userData.user.prefs?.Profile_Created) {
-            dispatch(login(userData.user));
+            dispatch(loginAndFetchPosts(userData.user));
           } else {
             let userID = userData.user.$id;
             let name = userData.user.name;
             let token = await databaseService.createProfile({ userID, name });
             if (token.success) {
-              dispatch(login(token.token));
+              dispatch(loginAndFetchPosts(token.token));
             }
           }
         } else {
