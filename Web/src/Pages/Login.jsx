@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import OAuthLogin from "../Component/Oauth";
 import { useForm } from 'react-hook-form';
-import { login, logout } from "../Feature/Auth";
+import { loginAndFetchPosts, logout } from "../Feature/Auth";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "../Component/Loader"
 import authService from "../Appwrite/auth";
@@ -29,7 +29,7 @@ const Login = () => {
         let userData = await authService.checkUser();
         if (userData.success) {
           console.log("User data In SignIn:", userData);
-          dispatch(login(userData.user));
+          dispatch(loginAndFetchPosts(userData.user));
           reset();
           navigate("/dashboard");
         }
