@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router";
 import OAuthLogin from "../Component/Oauth";
 import { useForm } from 'react-hook-form';
 import Loader from "../Component/Loader"
-import { login, logout } from "../Feature/Auth";
+import { loginAndFetchPosts, logout } from "../Feature/Auth";
 import { useDispatch, useSelector } from "react-redux";
 import authService from "../Appwrite/auth";
 import PagesLink from "../Component/PagesLink";
@@ -31,7 +31,7 @@ const Signup = () => {
         let userData = await authService.checkUser();
         if (userData.success) {
           console.log("User data In Signup:", userData);
-          dispatch(login(userData.user));
+          dispatch(loginAndFetchPosts(userData.user));
           reset();
           navigate("/dashboard")
         }
