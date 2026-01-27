@@ -2,7 +2,7 @@ import Footer from "./Component/Footer.jsx";
 import Header from "./Component/Header.jsx"
 import { Outlet, useNavigate } from "react-router";
 import { useDispatch, useSelector } from 'react-redux';
-import { loginAndFetchPosts ,logout, updateName } from './Feature/Auth.js';
+import { loginAndFetchPosts, logout, updateName } from './Feature/Auth.js';
 import authService from './Appwrite/auth.js';
 import Loader from "./Component/Loader.jsx";
 import { useLocation } from "react-router";
@@ -92,7 +92,13 @@ function App() {
         }
       }
     }
-  }, [location])
+  }, [location]);
+
+  useEffect(() => {
+    if (location?.pathname != "/") {
+      window.scrollTo(0, 0);
+    }
+  }, [location?.pathname])
   // useEffect(() => {
   //   const make = async () => {
   //     const res = await ai_function.aiMetaDataGenerator({
