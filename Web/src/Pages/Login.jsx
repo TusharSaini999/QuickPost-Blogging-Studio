@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Loader from "../Component/Loader"
 import authService from "../Appwrite/auth";
 import PagesLink from "../Component/PagesLink";
+import { Eye, EyeOff } from "lucide-react";
 const Login = () => {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const logindata = useSelector((state) => state.AuthSlice.status);
-
+  const [showPassword, setShowPassword] = React.useState(false);
   useEffect(() => {
     if (logindata) {
       navigate("/dashboard");
@@ -44,7 +45,7 @@ const Login = () => {
             dispatch(logout({ value: true }));
             setMessage(respones.message + " Please try again.");
           }
-        }else{
+        } else {
           setMessage(respones.message);
         }
       }
@@ -116,22 +117,39 @@ const Login = () => {
               <label className="block text-gray-800 dark:text-gray-300 mb-1 text-sm font-medium">
                 Password
               </label>
-              <input
-                type="password"
-                autoComplete="current-password"
-                placeholder="Enter your password"
-                {...register("password", {
-                  required: "Please enter your password",
-                  minLength: {
-                    value: 8,
-                    message: "Password must be at least 8 characters"
-                  },
-                })}
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-700 dark:focus:ring-red-500"
 
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                  {...register("password", {
+                    required: "Please enter your password",
+                    minLength: {
+                      value: 8,
+                      message: "Password must be at least 8 characters"
+                    },
+                  })}
+                  className="w-full px-4 py-2.5 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-700 dark:focus:ring-red-500"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
               )}
             </div>
             <div className="text-right">
