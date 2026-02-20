@@ -74,7 +74,7 @@ export default function DashboardOverview({
         <div className="mx-auto max-w-6xl px-4 py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight bg-gradient-to-r from-red-700 via-red-600 to-red-500 dark:from-red-600 dark:via-red-500 dark:to-red-400 bg-clip-text text-transparent">
-              Welcome back, {name}
+              Welcome, {name}
             </h1>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">Here’s your dashboard overview.</p>
           </div>
