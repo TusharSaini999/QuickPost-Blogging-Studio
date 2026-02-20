@@ -161,18 +161,6 @@ export class DatabaseService {
     visibility,
     dataObject,
   }) {
-    console.log(
-      "In BAckend",
-      title,
-      content,
-      feturedImage,
-      status,
-      userId,
-      Short_Description,
-      Tags,
-      visibility,
-      dataObject,
-    );
     try {
       let data = {
         name,
@@ -204,7 +192,7 @@ export class DatabaseService {
         }
       } else {
         data.fetureimage =
-          "https://nyc.cloud.appwrite.io/v1/storage/buckets/68850981002228af6958/files/68b1c838002ea271cbcc/view?project=6884f99f002310f0e0fe";
+          "https://nyc.cloud.appwrite.io/v1/storage/buckets/68850981002228af6958/files/68bc483c0004bd1df4c8/view?project=6884f99f002310f0e0fe";
       }
       let document = await this.databases.createDocument(
         env.APPWRITE_DB_ID,
