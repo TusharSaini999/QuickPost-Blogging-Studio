@@ -3,7 +3,7 @@ import { useState } from "react";
 
 function Card({
     postType = "Public",
-    imageLink = "https://picsum.photos/400/250",
+    imageLink = "https://nyc.cloud.appwrite.io/v1/storage/buckets/68850981002228af6958/files/68bc483c0004bd1df4c8/view?project=6884f99f002310f0e0fe",
     title = "Untitled Post",
     authorName = "Unknown Author",
     updatedAt = "2025-09-03T14:45:00",
