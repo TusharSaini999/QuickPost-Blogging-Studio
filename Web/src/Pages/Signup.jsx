@@ -7,6 +7,7 @@ import { loginAndFetchPosts, logout } from "../Feature/Auth";
 import { useDispatch, useSelector } from "react-redux";
 import authService from "../Appwrite/auth";
 import PagesLink from "../Component/PagesLink";
+import { Eye, EyeOff } from "lucide-react";
 
 const Signup = () => {
   const [message, setMessage] = useState("");
@@ -15,6 +16,9 @@ const Signup = () => {
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm();
   const logindata = useSelector((state) => state.AuthSlice.status);
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+
   useEffect(() => {
     if (logindata) {
       navigate("/dashboard");
@@ -122,40 +126,76 @@ const Signup = () => {
             </div>
 
             {/* Password */}
+            {/* Password */}
             <div>
               <label className="block text-gray-800 dark:text-gray-300 mb-1 text-sm font-medium">
                 Password
               </label>
-              <input
-                type="password"
-                {...register("password", {
-                  required: "Please enter your password",
-                  minLength: { value: 8, message: "Password must be at least 8 characters" },
-                })}
-                placeholder="Create a password"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-700 dark:focus:ring-red-500"
-                autoComplete="new-password"
-              />
-              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  {...register("password", {
+                    required: "Please enter your password",
+                    minLength: {
+                      value: 8,
+                      message: "Password must be at least 8 characters",
+                    },
+                  })}
+                  placeholder="Create a password"
+                  autoComplete="new-password"
+                  className="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-700 dark:focus:ring-red-500"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
+
 
             {/* Confirm Password */}
             <div>
               <label className="block text-gray-800 dark:text-gray-300 mb-1 text-sm font-medium">
                 Confirm Password
               </label>
-              <input
-                type="password"
-                {...register("Confirmpassword", {
-                  required: "Please enter your Confirm password",
-                  validate: (value) => value === password || "Passwords do not match"
-                })}
-                placeholder="Confirm your password"
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-700 dark:focus:ring-red-500"
-                autoComplete="new-password"
-              />
+
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  {...register("Confirmpassword", {
+                    required: "Please confirm your password",
+                    validate: (value) =>
+                      value === password || "Passwords do not match",
+                  })}
+                  placeholder="Confirm your password"
+                  autoComplete="new-password"
+                  className="w-full px-4 py-2 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-700 dark:focus:ring-red-500"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400"
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+
               {errors.Confirmpassword && (
-                <p className="text-red-500 text-sm mt-1">{errors.Confirmpassword.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.Confirmpassword.message}
+                </p>
               )}
             </div>
 
