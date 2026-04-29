@@ -123,6 +123,7 @@ Real-Time Sync & API Responses
 ## 🌳 Project Folder Structure
 
 ```
+
 PostApp/
 ├── Functions/
 │   ├── ai-tools/         # AI utilities (chat, metadata, summaries)
@@ -151,6 +152,7 @@ PostApp/
         ├── Feature/        # Redux slices
         ├── Pages/          # Application pages
         └── Store/          # Redux store setup
+
 ```
 
 ---
