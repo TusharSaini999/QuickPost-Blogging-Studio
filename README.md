@@ -71,27 +71,20 @@
 ## 🛠️ Tech Stack
 
 ### Frontend
-
-* React 19
-* Vite
-* React Router
-* Redux Toolkit
-* Tailwind CSS
+- React 19 · Vite · React Router  
+- Redux Toolkit · Tailwind CSS  
 
 ### Backend & Services
-
-* Appwrite
-
-  * Authentication
-  * Database
-  * Storage
-  * Real-time API
+- Appwrite  
+  - Authentication  
+  - Database  
+  - Storage  
+  - Real-time API  
 
 ### Tools & Libraries
-
-* TinyMCE – Rich text editor
-* Lucide React – Icons
-* Recharts – Charts & analytics
+- TinyMCE (Rich Text Editor)  
+- Lucide React (Icons)  
+- Recharts (Charts & Analytics)
 
 ---
 
@@ -130,6 +123,7 @@ Real-Time Sync & API Responses
 ## 🌳 Project Folder Structure
 
 ```
+
 PostApp/
 ├── Functions/
 │   ├── ai-tools/         # AI utilities (chat, metadata, summaries)
@@ -158,6 +152,7 @@ PostApp/
         ├── Feature/        # Redux slices
         ├── Pages/          # Application pages
         └── Store/          # Redux store setup
+
 ```
 
 ---
