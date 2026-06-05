@@ -1,6 +1,39 @@
 import { Groq } from "groq-sdk";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+function normalizeList(value) {
+    if (Array.isArray(value)) return value;
+    if (typeof value === "string" && value.trim()) return value.split(",").map((item) => item.trim()).filter(Boolean);
+    return [];
+}
+
+function normalizeContext(userContext = {}) {
+    return {
+        name: userContext?.name || "User",
+        assistantMode: userContext?.assistantMode || "general",
+        currentPageOnUser: userContext?.currentPageOnUser || userContext?.page || "App",
+        pathname: userContext?.pathname || "",
+        routeType: userContext?.routeType || "unknown",
+        pageGoal: userContext?.pageGoal || "",
+        quickPrompts: normalizeList(userContext?.quickPrompts),
+        totalPosts: {
+            Drafts: userContext?.totalPosts?.Drafts || 0,
+            Private: userContext?.totalPosts?.Private || 0,
+            Public: userContext?.totalPosts?.Public || 0,
+        },
+        postPerWeek: userContext?.postPerWeek || 0,
+        navigationMenu: normalizeList(userContext?.navigationMenu),
+        dashboardSummary: userContext?.dashboardSummary || {},
+        visibleSections: normalizeList(userContext?.visibleSections),
+        quickLinks: normalizeList(userContext?.quickLinks),
+        currentPost: userContext?.currentPost || {},
+        coverImage: userContext?.coverImage || {},
+        formFields: userContext?.formFields || {},
+        loadingSupport: userContext?.loadingSupport || {},
+        livePageSnapshot: userContext?.livePageSnapshot || {},
+    };
+}
 /**
  * Build system-level instructions for the AI
  */
@@ -11,8 +44,11 @@ Your role:
 - Help users while they are working inside Quick Post
 - Provide accurate, practical, and context-aware answers
 - Adapt your response based on the page the user is currently on
+- Act like an assistant bot for the active page (navigation, usage, and quick troubleshooting)
+- If user mentions loading issues, prioritize practical diagnostics and next actions
 Response guidelines:
 - Focus primarily on the current page context
+- Prefer the live page snapshot when available (title, path, headings, visible actions)
 - Give clear, direct, and helpful answers
 - Use simple, natural, human-like language
 - Do not make assumptions beyond the given context
@@ -25,21 +61,38 @@ Response guidelines:
  * Build user prompt with context
  */
 function buildUserPrompt({ userQuery, userContext }) {
+    const context = normalizeContext(userContext);
+
     // Extract common data
-    const { name, totalPosts, postPerWeek, navigationMenu } = userContext;
+    const { name, assistantMode, pathname, routeType, pageGoal, quickPrompts, totalPosts, postPerWeek, navigationMenu, loadingSupport, livePageSnapshot } = context;
     const commonContext = `
 User: ${name}
+Assistant Mode: ${assistantMode}
+Route Path: ${pathname}
+Route Type: ${routeType}
+Page Goal: ${pageGoal}
+Suggested Prompt Starters: ${quickPrompts.join(", ")}
 Total Posts: Drafts(${totalPosts.Drafts}), Private(${totalPosts.Private}), Public(${totalPosts.Public})
 Posts Per Week: ${postPerWeek}
 Navigation Menu: ${navigationMenu.join(", ")}
+Loading Support Enabled: ${Boolean(loadingSupport?.enabled)}
+Loading Guidance: ${loadingSupport?.guidance || ""}
+Live Page Snapshot:
+    Path: ${livePageSnapshot?.path || ""}
+    Url: ${livePageSnapshot?.fullUrl || ""}
+    Title: ${livePageSnapshot?.title || ""}
+    Headings: ${livePageSnapshot?.headings?.join(", ") || ""}
+    Visible Actions: ${livePageSnapshot?.visibleActions?.join(", ") || ""}
+    Page Is Likely Loading: ${Boolean(livePageSnapshot?.pageIsLikelyLoading)}
+    Captured At: ${livePageSnapshot?.capturedAt || ""}
 `;
 
     // Determine page-specific context
     let pageContext = "";
-    const currentPage = userContext.currentPageOnUser;
+    const currentPage = context.currentPageOnUser;
 
     if (currentPage === "Dashboard") {
-        const { dashboardSummary, visibleSections, quickLinks } = userContext;
+        const { dashboardSummary, visibleSections, quickLinks } = context;
         pageContext = `
 Current Page: Dashboard
 Welcome Message: ${dashboardSummary?.welcomeMessage || ""}
@@ -47,7 +100,7 @@ Visible Sections: ${visibleSections?.join(", ") || ""}
 Quick Links: ${quickLinks?.join(", ") || ""}
 `;
     } else if (currentPage === "Create Post Page" || currentPage === "Edit Post Page") {
-        const { currentPost, coverImage, formFields } = userContext;
+        const { currentPost, coverImage, formFields } = context;
         pageContext = `
 Current Page: ${currentPage}
 Current Post Title: ${currentPost?.title || ""}
@@ -97,6 +150,25 @@ Content Style:
   Font Family: ${formFields?.contentStyle?.fontFamily || ""}
   Font Size: ${formFields?.contentStyle?.fontSize || ""}
   Line Height: ${formFields?.contentStyle?.lineHeight || ""}
+`;
+    } else if (currentPage === "Login" || currentPage === "Signup" || currentPage === "Forgot Password" || currentPage === "Verify New Password" || currentPage === "Email Verification") {
+        pageContext = `Current Page: ${currentPage}`;
+    } else if (
+        currentPage === "Home" ||
+        currentPage === "Profile Page" ||
+        currentPage === "Posts Page" ||
+        currentPage === "Public Feed Page" ||
+        currentPage === "Post View Page" ||
+        currentPage === "Public Post View Page"
+    ) {
+        pageContext = `
+Current Page: ${currentPage}
+Visible Sections: ${context?.visibleSections?.join(", ") || ""}
+Quick Links: ${context?.quickLinks?.join(", ") || ""}
+Instructions for AI:
+- Help user understand what this page is for.
+- Suggest the best next actions for this page.
+- If user reports loading delay or missing UI, suggest a short troubleshooting checklist tied to the visible sections.
 `;
     } else {
         pageContext = `Current Page: ${currentPage || "Unknown Page"}`;
