@@ -13,9 +13,12 @@ import StatusModal from "./Component/PopupMessage.jsx";
 import { getPost } from "./Feature/Post.js";
 import ErrorMessage from "./Component/ErrorMessage.jsx";
 import { clearError } from "./Feature/Post.js";
+import AIAssistantSidebar from "./Component/AIAssistant.jsx";
+import { useAIPageContext } from "./Component/AIPageContext.jsx";
 // import ai_function from "./Appwrite/ai_function.js";
 
 function App() {
+  const { pageAIContext } = useAIPageContext();
   const dispatch = useDispatch();
   const location = useLocation();
   const post = useSelector((state) => state.PostSlice)
@@ -32,6 +35,75 @@ function App() {
     title: "",
     description: ""
   });
+
+  const getAssistantPage = (pathname) => {
+    if (pathname === "/") return "Home";
+    if (pathname === "/login") return "Login";
+    if (pathname === "/signup") return "Signup";
+    if (pathname === "/forgot") return "Forgot Password";
+    if (pathname === "/verify") return "Verify New Password";
+    if (pathname === "/verify-email") return "Email Verification";
+    if (pathname === "/dashboard") return "Dashboard";
+    if (pathname === "/dashboard/profile") return "Profile Page";
+    if (pathname === "/dashboard/create") return "Create Post Page";
+    if (pathname.startsWith("/dashboard/post/edit/")) return "Edit Post Page";
+    if (pathname.startsWith("/dashboard/post/view/")) return "Post View Page";
+    if (pathname === "/dashboard/post") return "Posts Page";
+    if (pathname === "/dashboard/post/public") return "Public Posts Page";
+    if (pathname === "/dashboard/post/private") return "Private Posts Page";
+    if (pathname === "/dashboard/post/drafts") return "Drafts Page";
+    if (pathname === "/dashboard/publicPost") return "Public Feed Page";
+    if (pathname.startsWith("/dashboard/publicPost/view/")) return "Public Post View Page";
+    return "App";
+  };
+
+  const getAssistantContext = (pathname) => {
+    const currentPage = getAssistantPage(pathname);
+
+    const sharedContext = {
+      currentPageOnUser: currentPage,
+      pathname,
+      routeType: pathname.startsWith("/dashboard") ? "private" : "public",
+      loadingSupport: {
+        enabled: true,
+        guidance: "If content is not loading, identify the section name, what is visible now, and what action the user last clicked.",
+      },
+    };
+
+    if (currentPage === "Home") {
+      return {
+        ...sharedContext,
+        visibleSections: ["Hero", "About", "Features", "Services", "Contact"],
+        quickLinks: ["Login", "Signup", "Explore features", "Contact"],
+      };
+    }
+
+    if (currentPage === "Posts Page") {
+      return {
+        ...sharedContext,
+        visibleSections: ["Posts Header", "Sort Controls", "Post Cards", "Infinite Scroll"],
+        quickLinks: ["Open post", "Edit post", "Delete post", "Change sorting"],
+      };
+    }
+
+    if (currentPage === "Profile Page") {
+      return {
+        ...sharedContext,
+        visibleSections: ["Profile Sidebar", "Profile Details", "Change Password", "Logout"],
+        quickLinks: ["Edit profile", "Upload photo", "Change password"],
+      };
+    }
+
+    if (currentPage === "Public Feed Page") {
+      return {
+        ...sharedContext,
+        visibleSections: ["Feed Header", "Public Cards", "Post View Links"],
+        quickLinks: ["Open public post", "Read feed", "Share link"],
+      };
+    }
+
+    return sharedContext;
+  };
   useEffect(() => {
     if (location.pathname == "/login" || location.pathname == "/signup" || location.pathname == "/forgot" || location.pathname == "/verify" || location.pathname == "/verify-email") {
       setsignlogin(true);
@@ -152,6 +224,14 @@ function App() {
       <ErrorMessage message={errormessage} />
       <Loader value={isloading} />
       <Outlet />
+      <AIAssistantSidebar
+        fullPage={false}
+        page={getAssistantPage(location.pathname)}
+        pageContext={{
+          ...getAssistantContext(location.pathname),
+          ...(pageAIContext || {}),
+        }}
+      />
       {!signlogin && <Footer />}
     </>
   )

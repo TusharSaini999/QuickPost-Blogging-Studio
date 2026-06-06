@@ -17,6 +17,7 @@ import Edit from './Pages/Edit.jsx';
 import Post from './Pages/Post.jsx';
 import PostView from './Pages/PostView.jsx';
 import PublicPosts from './Pages/GlobalPost.jsx'
+import { AIPageContextProvider } from './Component/AIPageContext.jsx'
 
 let router = createBrowserRouter([
   {
@@ -134,8 +135,10 @@ const ThemeProvider = ({ children }) => {
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
-    <ThemeProvider>
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <AIPageContextProvider>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </AIPageContextProvider>
   </Provider>
 );
