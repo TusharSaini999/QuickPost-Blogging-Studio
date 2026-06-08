@@ -9,12 +9,18 @@ import rehypeSanitize from "rehype-sanitize";
 
 const PAGE_HELP_CONFIG = {
   Home: {
-    intro: "I can guide you through Home sections like Features, Services, and Contact. If anything feels slow or not loading, tell me what you expected to see and I will help quickly.",
+    intro: "I can guide you through Home sections (Features, Services, Contact). Tell me what you want to do and I'll walk you through it or help fix slow loading.",
     suggestions: [
-      "Explain this page quickly",
-      "Where do I start as a new user?",
-      "Home page is loading slowly"
+      "How do I get started with Quick Post?",
+      "Show me the main features of Quick Post.",
+      "How can I create and publish my first post?"
     ],
+    feedbackForm: {
+      label: "Tell us what's wrong",
+      placeholder: "e.g., Home page takes 10–20s to load on desktop",
+      submit: "Send feedback",
+      confirmation: "Thanks — we received your report and will investigate."
+    },
   },
   Dashboard: {
     intro: "I am synced with your Dashboard context. I can help you understand stats, find actions fast, and troubleshoot loading issues in overview cards.",
@@ -134,6 +140,7 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
   const topResizerRef = useRef(null);
   const shouldAutoScrollRef = useRef(true);
   const lastPageRef = useRef(null);
+  const inputRef = useRef(null);
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
@@ -412,19 +419,7 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
                 </div>
               )}
 
-              {messages.length <= 1 && quickPrompts.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {quickPrompts.map((prompt, index) => (
-                    <button
-                      key={`${prompt}-${index}`}
-                      onClick={() => setInput(prompt)}
-                      className="text-xs px-3 py-1.5 rounded-full border border-pink-200 dark:border-pink-700 text-pink-600 dark:text-pink-200 hover:bg-pink-50 dark:hover:bg-pink-900/30 transition-colors"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              )}
+              
 
               {messages.map((msg, idx) => (
                 <div key={idx} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
@@ -471,9 +466,26 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
 
             {/* Footer */}
             <div className="p-4 border-t border-pink-50 dark:border-pink-900/30 bg-white/10 dark:bg-gray-950/30 backdrop-blur-sm">
+              {quickPrompts.length > 0 && (
+                <div className="mb-3 overflow-x-auto scrollbar-hidden">
+                  <div className="flex gap-2 whitespace-nowrap px-1">
+                    {quickPrompts.map((prompt, i) => (
+                      <button
+                        key={`suggest-${i}`}
+                        onClick={() => { setInput(prompt); inputRef.current && inputRef.current.focus(); }}
+                        className="inline-flex flex-shrink-0 text-xs px-3 py-1.5 rounded-full border border-pink-200 dark:border-pink-700 text-pink-600 dark:text-pink-200 hover:bg-pink-50 dark:hover:bg-pink-900/30 transition-colors"
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="relative flex items-center gap-2 bg-gray-50/30 dark:bg-pink-900/10 border border-pink-100 dark:border-pink-900/50 p-2 rounded-2xl focus-within:ring-2 ring-pink-500/20 transition-all">
                 <input
                   type="text"
+                  ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") { handleSend(); } }}
@@ -496,5 +508,3 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
     </div>
   );
 }
-
-
