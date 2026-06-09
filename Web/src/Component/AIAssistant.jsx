@@ -85,8 +85,7 @@ function getPageHelp(page) {
     intro: `I can help on the ${page} page. Ask for navigation help, feature guidance, or loading issue support.`,
     suggestions: [
       "Explain this page",
-      "What can I do here?",
-      "This page is not loading correctly"
+      "What can I do here?"
     ],
   };
 }
