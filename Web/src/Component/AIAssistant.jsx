@@ -507,5 +507,3 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
     </div>
   );
 }
-
-
