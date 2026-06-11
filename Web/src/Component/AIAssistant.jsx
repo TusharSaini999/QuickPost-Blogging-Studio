@@ -166,8 +166,9 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
     if (lastPageRef.current === page) return;
     lastPageRef.current = page;
 
-    setMessages((prev) => [
-      ...prev,
+    setTyping(false);
+    shouldAutoScrollRef.current = true;
+    setMessages([
       {
         type: "ai",
         text: pageHelp.intro,
