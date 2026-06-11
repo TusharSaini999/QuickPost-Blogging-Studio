@@ -81,8 +81,20 @@ function App() {
     if (currentPage === "Posts Page") {
       return {
         ...sharedContext,
+        pageVariant: "user-posts",
+        pageGoal: "Manage your dashboard posts, sort them, and open them for editing or review.",
         visibleSections: ["Posts Header", "Sort Controls", "Post Cards", "Infinite Scroll"],
         quickLinks: ["Open post", "Edit post", "Delete post", "Change sorting"],
+      };
+    }
+
+    if (currentPage === "Public Posts Page") {
+      return {
+        ...sharedContext,
+        pageVariant: "user-public-posts",
+        pageGoal: "Manage your public dashboard posts and open them for review.",
+        visibleSections: ["Posts Header", "Sort Controls", "Post Cards", "Infinite Scroll"],
+        quickLinks: ["Open public post", "Edit public post", "Delete public post", "Change sorting"],
       };
     }
 
@@ -97,8 +109,24 @@ function App() {
     if (currentPage === "Public Feed Page") {
       return {
         ...sharedContext,
+        pageVariant: "public-feed",
+        pageGoal: "Browse public posts, search content, and open a post to read it.",
         visibleSections: ["Feed Header", "Public Cards", "Post View Links"],
         quickLinks: ["Open public post", "Read feed", "Share link"],
+      };
+    }
+
+    if (currentPage === "Post View Page" || currentPage === "Public Post View Page") {
+      return {
+        ...sharedContext,
+        pageVariant: currentPage === "Public Post View Page" ? "public-post-view" : "user-post-view",
+        pageGoal: currentPage === "Public Post View Page"
+          ? "Read a public post in detail."
+          : "Review a dashboard post in detail.",
+        visibleSections: ["Back Button", "Cover Image", "Post Details", "AI Summary", "Article Content"],
+        quickLinks: currentPage === "Public Post View Page"
+          ? ["Summarize post", "Go back to feed"]
+          : ["Summarize post", "Go back to posts", "Edit post"],
       };
     }
 
