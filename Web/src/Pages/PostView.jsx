@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import SummaryGenerator from "../Component/SummeryAI";
+import { useAIPageContext } from "../Component/AIPageContext";
 const PostView = () => {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -11,22 +12,29 @@ const PostView = () => {
     const publicPost = useSelector((state) => state.PostSlice.PublicPost);
     const privatePost = useSelector((state) => state.PostSlice.PrivatePost);
     const GlobalPost = useSelector((state) => state.GobalSlice.posts)
+    const { setPageAIContext } = useAIPageContext();
     const [post, setPost] = useState({});
     const [loading, setLoading] = useState(false);
     useEffect(() => {
         setLoading(true);
+        let sourcePage = "Post View Page";
         if (postdata[id] || draftPost[id] || publicPost[id] || privatePost[id] || GlobalPost[id]) {
             let temp;
             if (postdata[id]) {
                 temp = postdata[id];
+                sourcePage = "Post View Page";
             } else if (draftPost[id]) {
                 temp = draftPost[id];
+                sourcePage = "Post View Page";
             } else if (publicPost[id]) {
                 temp = publicPost[id];
+                sourcePage = "Post View Page";
             } else if (privatePost[id]) {
                 temp = privatePost[id];
+                sourcePage = "Post View Page";
             } else if (GlobalPost[id]) {
                 temp = GlobalPost[id];
+                sourcePage = "Public Post View Page";
             }
 
             let visibility = "";
@@ -46,9 +54,30 @@ const PostView = () => {
                 coverImageUrl: temp?.fetureimage,
                 htmlContent: temp?.content,
             })
+
+            setPageAIContext({
+                currentPageOnUser: sourcePage,
+                pageVariant: sourcePage === "Public Post View Page" ? "public-post-view" : "user-post-view",
+                routeType: sourcePage === "Public Post View Page" ? "public" : "private",
+                pageGoal: sourcePage === "Public Post View Page"
+                    ? "Read a public post and understand the content quickly."
+                    : "Review one of your dashboard posts in detail.",
+                currentPost: {
+                    title: temp?.titles || "",
+                    shortDescription: temp?.shortDescription || "",
+                    tags: temp?.tags || [],
+                    visibility,
+                    author: temp?.name || "",
+                },
+                visibleSections: ["Back Button", "Cover Image", "Post Details", "AI Summary", "Article Content"],
+                quickLinks: sourcePage === "Public Post View Page"
+                    ? ["Read the post", "Go back to the feed", "Summarize this post"]
+                    : ["Edit post", "Go back to posts", "Summarize this post"],
+            });
         }
         setLoading(false)
-    }, [postdata])
+        return () => setPageAIContext(null);
+    }, [id, postdata, draftPost, publicPost, privatePost, GlobalPost, setPageAIContext])
 
     const createdDate = post?.createdAt ? new Date(post?.createdAt).toLocaleString() : "-";
     const updatedDate = post?.updatedAt ? new Date(post?.updatedAt).toLocaleString() : "-";

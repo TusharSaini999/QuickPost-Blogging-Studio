@@ -9,10 +9,12 @@ import { removePostCount } from "../Feature/Auth";
 import { deletePostContext } from "../Feature/Post";
 import { useNavigate } from "react-router";
 import { ArrowUp, ArrowDown, Calendar, RefreshCcw } from "lucide-react";
+import { useAIPageContext } from "../Component/AIPageContext";
 
 function Post({ type = "all" }) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { setPageAIContext } = useAIPageContext();
 
     const userData = useSelector((s) => s.AuthSlice.userData);
     const postSlice = useSelector((s) => s.PostSlice);
@@ -145,6 +147,56 @@ function Post({ type = "all" }) {
         const dateB = sortBy === "created" ? new Date(b.$createdAt) : new Date(b.$updatedAt);
         return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
     });
+
+    useEffect(() => {
+        const pageNameMap = {
+            all: "Posts Page",
+            public: "Public Posts Page",
+            private: "Private Posts Page",
+            drafts: "Drafts Page",
+        };
+
+        const quickLinksMap = {
+            all: ["Open post", "Edit post", "Delete post", "Change sorting"],
+            public: ["Open public post", "Edit public post", "Delete post", "Change sorting"],
+            private: ["Open private post", "Edit private post", "Delete post", "Change sorting"],
+            drafts: ["Open draft", "Edit draft", "Delete draft", "Change sorting"],
+        };
+
+        // Extract visible posts data for AI context
+        const visiblePosts = sortedPosts.map(([id, post]) => ({
+            id,
+            title: post.titles || post.title || "Untitled",
+            shortDescription: post.shortDescription || "",
+            authorName: post.name || post.authorName || "Unknown",
+            status: post.status || "",
+            visibility: post.visibility || "",
+            category: post.category || "",
+            tags: post.tags || [],
+            $updatedAt: post.$updatedAt,
+            $createdAt: post.$createdAt,
+        }));
+
+        setPageAIContext({
+            currentPageOnUser: pageNameMap[type] || "Posts Page",
+            pageVariant: `user-posts-${type}`,
+            routeType: "private",
+            pageGoal: "Manage, sort, and review your dashboard posts.",
+            visibleSections: ["Posts Header", "Sort Controls", "Post Cards", "Infinite Scroll", "Delete Modal"],
+            quickLinks: quickLinksMap[type] || quickLinksMap.all,
+            postSummary: {
+                filter: type,
+                totalVisiblePosts: sortedPosts.length,
+                loadingMore,
+                hasNextPage: Boolean(postSlice?.cursors?.[type]),
+            },
+            visiblePosts: visiblePosts,
+            sortBy,
+            sortOrder,
+        });
+
+        return () => setPageAIContext(null);
+    }, [type, sortedPosts, loadingMore, postSlice?.cursors, setPageAIContext, sortBy, sortOrder]);
 
     return (
         <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors p-6">

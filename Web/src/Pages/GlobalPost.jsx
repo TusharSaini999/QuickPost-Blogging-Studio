@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchGlobalPosts } from "../Feature/GlobalPost";
 import CardSkeleton from "../Component/CardSkeleton";
 import { clearSearchPosts } from "../Feature/GlobalPost"
+import { useAIPageContext } from "../Component/AIPageContext";
 
 function PublicPosts() {
   const loading = useSelector((state) => state.GobalSlice?.loading);
@@ -18,6 +19,7 @@ function PublicPosts() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState("Page");
+  const { setPageAIContext } = useAIPageContext();
   const postData = useSelector((state) =>
     mode === "Page"
       ? state.GobalSlice?.posts
@@ -97,6 +99,40 @@ function PublicPosts() {
       dispatch(clearSearchPosts());
     }
   }, [mode]);
+
+  useEffect(() => {
+    // Extract visible posts data for AI context
+    const visiblePosts = Object.entries(postData || {}).map(([id, post]) => ({
+      id,
+      title: post.title || "Untitled",
+      shortDescription: post.shortDescription || "",
+      authorName: post.authorName || "Unknown",
+      category: post.category || "",
+      tags: post.tags || [],
+      $updatedAt: post.$updatedAt,
+      $createdAt: post.$createdAt,
+    }));
+
+    setPageAIContext({
+      currentPageOnUser: "Public Feed Page",
+      pageVariant: mode === "Search" ? "public-feed-search" : "public-feed",
+      routeType: "public",
+      pageGoal: "Browse public posts, search for content, and open a post to read it.",
+      visibleSections: ["Feed Header", "Search Controls", "Sort Controls", "Public Post Cards", "Infinite Scroll"],
+      quickLinks: ["Open public post", "Search posts", "Sort posts", "Scroll for more"],
+      postSummary: {
+        mode,
+        totalVisiblePosts: Object.keys(postData || {}).length,
+        hasNextPage: lastId !== null,
+        hasSearchResults: mode === "Search" && Object.keys(postData || {}).length > 0,
+      },
+      visiblePosts: visiblePosts,
+      sortBy,
+      sortOrder,
+    });
+
+    return () => setPageAIContext(null);
+  }, [mode, postData, lastId, setPageAIContext, sortBy, sortOrder]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors p-6">

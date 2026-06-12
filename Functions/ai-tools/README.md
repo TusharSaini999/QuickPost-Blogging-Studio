@@ -110,6 +110,7 @@ Handles AI chat messages and returns interactive responses.
 * Interactive AI Chat
 * Simple REST API interface
 * Easy to extend for additional AI functionalities
+* Used by the frontend Chatbot component: [Web/src/Component/AIAssistant.jsx](../../Web/src/Component/AIAssistant.jsx#L1)
 
 ---
 
