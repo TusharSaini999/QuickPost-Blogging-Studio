@@ -163,6 +163,20 @@ function Post({ type = "all" }) {
             drafts: ["Open draft", "Edit draft", "Delete draft", "Change sorting"],
         };
 
+        // Extract visible posts data for AI context
+        const visiblePosts = sortedPosts.map(([id, post]) => ({
+            id,
+            title: post.titles || post.title || "Untitled",
+            shortDescription: post.shortDescription || "",
+            authorName: post.name || post.authorName || "Unknown",
+            status: post.status || "",
+            visibility: post.visibility || "",
+            category: post.category || "",
+            tags: post.tags || [],
+            $updatedAt: post.$updatedAt,
+            $createdAt: post.$createdAt,
+        }));
+
         setPageAIContext({
             currentPageOnUser: pageNameMap[type] || "Posts Page",
             pageVariant: `user-posts-${type}`,
@@ -176,10 +190,13 @@ function Post({ type = "all" }) {
                 loadingMore,
                 hasNextPage: Boolean(postSlice?.cursors?.[type]),
             },
+            visiblePosts: visiblePosts,
+            sortBy,
+            sortOrder,
         });
 
         return () => setPageAIContext(null);
-    }, [type, sortedPosts.length, loadingMore, postSlice?.cursors, setPageAIContext]);
+    }, [type, sortedPosts, loadingMore, postSlice?.cursors, setPageAIContext, sortBy, sortOrder]);
 
     return (
         <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors p-6">

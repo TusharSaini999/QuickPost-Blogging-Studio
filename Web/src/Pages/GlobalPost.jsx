@@ -101,6 +101,18 @@ function PublicPosts() {
   }, [mode]);
 
   useEffect(() => {
+    // Extract visible posts data for AI context
+    const visiblePosts = Object.entries(postData || {}).map(([id, post]) => ({
+      id,
+      title: post.title || "Untitled",
+      shortDescription: post.shortDescription || "",
+      authorName: post.authorName || "Unknown",
+      category: post.category || "",
+      tags: post.tags || [],
+      $updatedAt: post.$updatedAt,
+      $createdAt: post.$createdAt,
+    }));
+
     setPageAIContext({
       currentPageOnUser: "Public Feed Page",
       pageVariant: mode === "Search" ? "public-feed-search" : "public-feed",
@@ -114,10 +126,13 @@ function PublicPosts() {
         hasNextPage: lastId !== null,
         hasSearchResults: mode === "Search" && Object.keys(postData || {}).length > 0,
       },
+      visiblePosts: visiblePosts,
+      sortBy,
+      sortOrder,
     });
 
     return () => setPageAIContext(null);
-  }, [mode, postData, lastId, setPageAIContext]);
+  }, [mode, postData, lastId, setPageAIContext, sortBy, sortOrder]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors p-6">
