@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import Card from "../Component/Card";
 import { useSelector, useDispatch } from "react-redux";
 import CardSkeleton from "../Component/CardSkeleton";
@@ -142,11 +142,13 @@ function Post({ type = "all" }) {
     // -----------------------------
     // Sort posts
     // -----------------------------
-    const sortedPosts = Object.entries(data).sort(([, a], [, b]) => {
-        const dateA = sortBy === "created" ? new Date(a.$createdAt) : new Date(a.$updatedAt);
-        const dateB = sortBy === "created" ? new Date(b.$createdAt) : new Date(b.$updatedAt);
-        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-    });
+    const sortedPosts = useMemo(() => {
+        return Object.entries(data).sort(([, a], [, b]) => {
+            const dateA = sortBy === "created" ? new Date(a.$createdAt) : new Date(a.$updatedAt);
+            const dateB = sortBy === "created" ? new Date(b.$createdAt) : new Date(b.$updatedAt);
+            return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+        });
+    }, [data, sortBy, sortOrder]);
 
     useEffect(() => {
         const pageNameMap = {
@@ -163,6 +165,20 @@ function Post({ type = "all" }) {
             drafts: ["Open draft", "Edit draft", "Delete draft", "Change sorting"],
         };
 
+        // Extract visible posts data for AI context
+        const visiblePosts = sortedPosts.map(([id, post]) => ({
+            id,
+            title: post.titles || post.title || "Untitled",
+            shortDescription: post.shortDescription || "",
+            authorName: post.name || post.authorName || "Unknown",
+            status: post.status || "",
+            visibility: post.visibility || "",
+            category: post.category || "",
+            tags: post.tags || [],
+            $updatedAt: post.$updatedAt,
+            $createdAt: post.$createdAt,
+        }));
+
         setPageAIContext({
             currentPageOnUser: pageNameMap[type] || "Posts Page",
             pageVariant: `user-posts-${type}`,
@@ -176,10 +192,13 @@ function Post({ type = "all" }) {
                 loadingMore,
                 hasNextPage: Boolean(postSlice?.cursors?.[type]),
             },
+            visiblePosts: visiblePosts,
+            sortBy,
+            sortOrder,
         });
 
         return () => setPageAIContext(null);
-    }, [type, sortedPosts.length, loadingMore, postSlice?.cursors, setPageAIContext]);
+    }, [type, sortedPosts, loadingMore, postSlice?.cursors, setPageAIContext, sortBy, sortOrder]);
 
     return (
         <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors p-6">
