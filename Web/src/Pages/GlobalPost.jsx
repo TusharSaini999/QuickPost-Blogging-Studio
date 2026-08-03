@@ -265,7 +265,7 @@ function PublicPosts() {
               authorName={post.name}
               updatedAt={post.$updatedAt}
               shortDescription={post.shortDescription}
-              onClick={() => navigate(`/dashboard/publicPost/view/${id}`)}
+              onClick={() => navigate(`/dashboard/publicpost/view/${id}`)}
               editmode={false}
             />
           ))}

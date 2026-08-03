@@ -52,8 +52,8 @@ function App() {
     if (pathname === "/dashboard/post/public") return "Public Posts Page";
     if (pathname === "/dashboard/post/private") return "Private Posts Page";
     if (pathname === "/dashboard/post/drafts") return "Drafts Page";
-    if (pathname === "/dashboard/publicPost") return "Public Feed Page";
-    if (pathname.startsWith("/dashboard/publicPost/view/")) return "Public Post View Page";
+    if (pathname === "/dashboard/publicpost") return "Public Feed Page";
+    if (pathname.startsWith("/dashboard/publicpost/view/")) return "Public Post View Page";
     return "App";
   };
 

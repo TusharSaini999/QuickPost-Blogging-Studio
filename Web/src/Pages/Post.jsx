@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import Card from "../Component/Card";
 import { useSelector, useDispatch } from "react-redux";
 import CardSkeleton from "../Component/CardSkeleton";
@@ -142,11 +142,13 @@ function Post({ type = "all" }) {
     // -----------------------------
     // Sort posts
     // -----------------------------
-    const sortedPosts = Object.entries(data).sort(([, a], [, b]) => {
-        const dateA = sortBy === "created" ? new Date(a.$createdAt) : new Date(a.$updatedAt);
-        const dateB = sortBy === "created" ? new Date(b.$createdAt) : new Date(b.$updatedAt);
-        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
-    });
+    const sortedPosts = useMemo(() => {
+        return Object.entries(data).sort(([, a], [, b]) => {
+            const dateA = sortBy === "created" ? new Date(a.$createdAt) : new Date(a.$updatedAt);
+            const dateB = sortBy === "created" ? new Date(b.$createdAt) : new Date(b.$updatedAt);
+            return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+        });
+    }, [data, sortBy, sortOrder]);
 
     useEffect(() => {
         const pageNameMap = {
