@@ -13,6 +13,7 @@ function normalizeContext(userContext = {}) {
         name: userContext?.name || "User",
         assistantMode: userContext?.assistantMode || "general",
         currentPageOnUser: userContext?.currentPageOnUser || userContext?.page || "App",
+        pageVariant: userContext?.pageVariant || "",
         pathname: userContext?.pathname || "",
         routeType: userContext?.routeType || "unknown",
         pageGoal: userContext?.pageGoal || "",
@@ -30,6 +31,7 @@ function normalizeContext(userContext = {}) {
         currentPost: userContext?.currentPost || {},
         coverImage: userContext?.coverImage || {},
         formFields: userContext?.formFields || {},
+        postSummary: userContext?.postSummary || {},
         loadingSupport: userContext?.loadingSupport || {},
         livePageSnapshot: userContext?.livePageSnapshot || {},
     };
@@ -64,10 +66,12 @@ function buildUserPrompt({ userQuery, userContext }) {
     const context = normalizeContext(userContext);
 
     // Extract common data
-    const { name, assistantMode, pathname, routeType, pageGoal, quickPrompts, totalPosts, postPerWeek, navigationMenu, loadingSupport, livePageSnapshot } = context;
+    const { name, assistantMode, currentPageOnUser, pageVariant, pathname, routeType, pageGoal, quickPrompts, totalPosts, postPerWeek, navigationMenu, loadingSupport, livePageSnapshot, postSummary } = context;
     const commonContext = `
 User: ${name}
 Assistant Mode: ${assistantMode}
+Current Page Label: ${currentPageOnUser}
+Page Variant: ${pageVariant}
 Route Path: ${pathname}
 Route Type: ${routeType}
 Page Goal: ${pageGoal}
@@ -75,6 +79,7 @@ Suggested Prompt Starters: ${quickPrompts.join(", ")}
 Total Posts: Drafts(${totalPosts.Drafts}), Private(${totalPosts.Private}), Public(${totalPosts.Public})
 Posts Per Week: ${postPerWeek}
 Navigation Menu: ${navigationMenu.join(", ")}
+Post Summary: ${JSON.stringify(postSummary || {})}
 Loading Support Enabled: ${Boolean(loadingSupport?.enabled)}
 Loading Guidance: ${loadingSupport?.guidance || ""}
 Live Page Snapshot:
@@ -157,6 +162,7 @@ Content Style:
         currentPage === "Home" ||
         currentPage === "Profile Page" ||
         currentPage === "Posts Page" ||
+        currentPage === "Public Posts Page" ||
         currentPage === "Public Feed Page" ||
         currentPage === "Post View Page" ||
         currentPage === "Public Post View Page"
@@ -165,6 +171,7 @@ Content Style:
 Current Page: ${currentPage}
 Visible Sections: ${context?.visibleSections?.join(", ") || ""}
 Quick Links: ${context?.quickLinks?.join(", ") || ""}
+Post Summary: ${JSON.stringify(postSummary || {})}
 Instructions for AI:
 - Help user understand what this page is for.
 - Suggest the best next actions for this page.

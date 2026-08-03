@@ -10,7 +10,7 @@ import { ID } from "appwrite";
 import databaseService from "../Appwrite/databases";
 import Ai_metadata from "../Component/Ai_metadata";
 import ai_function from "../Appwrite/ai_function";
-import AIAssistantSidebar from "../Component/AIAssistant";
+import { useAIPageContext } from "../Component/AIPageContext";
 export default function CreatePost() {
   const editorRef = useRef(null);
   const dispatch = useDispatch();
@@ -27,6 +27,7 @@ export default function CreatePost() {
   const draftPost = useSelector((state) => state.PostSlice.DraftPost);
   const publicPost = useSelector((state) => state.PostSlice.PublicPost);
   const privatePost = useSelector((state) => state.PostSlice.PrivatePost);
+  const { setPageAIContext } = useAIPageContext();
   const [propAI, setPropAI] = useState({
     loading: false,
     error: null
@@ -389,6 +390,56 @@ export default function CreatePost() {
     };
     return editData
   }
+
+  useEffect(() => {
+    const subscription = watch((values) => {
+      setPageAIContext({
+        currentPageOnUser: !id ? "Create Post Page" : "Edit Post Page",
+        currentPost: {
+          title: values?.title || "",
+          shortDescription: values?.excerpt || "",
+          keywords: values?.tags || [],
+          content: values?.content || "",
+        },
+        coverImage: {
+          enabled: true,
+          optional: true,
+          uploaded: Boolean(values?.coverImage),
+        },
+        formFields: {
+          title: {
+            label: "Post Title",
+            placeholder: "Enter your post title...",
+            value: values?.title || "",
+            required: true,
+          },
+          shortDescription: {
+            label: "Short Description",
+            placeholder: "Write a 2–3 line summary of your post...",
+            value: values?.excerpt || "",
+            required: true,
+          },
+          tags: {
+            label: "Tags",
+            placeholder: "Press Enter to add tag",
+            values: values?.tags || [],
+            maxRecommended: 5,
+          },
+          visibility: {
+            label: "Visibility",
+            options: ["Public", "Private"],
+            selected: values?.visibility || "Public",
+          },
+          type: "TinyMCE",
+        },
+      });
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      setPageAIContext(null);
+    };
+  }, [watch, id, setPageAIContext]);
   return (
     <>
       {isLoading ?
@@ -450,7 +501,6 @@ export default function CreatePost() {
         </div>
         :
         <>
-          <AIAssistantSidebar fullPage={false} page={id ? "Edit Post Page" : "Create Post Page"} AICall={getdata} />
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="min-h-screen px-6 py-8 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-300"

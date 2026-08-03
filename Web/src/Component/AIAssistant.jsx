@@ -6,13 +6,127 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
-export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard", AICall }) {
+
+const PAGE_HELP_CONFIG = {
+  Home: {
+    intro: "I can guide you through Home sections (Features, Services, Contact). Tell me what you want to do and I'll walk you through it or help fix slow loading.",
+    suggestions: [
+      "How do I get started with Quick Post?",
+      "Show me the main features of Quick Post.",
+      "How can I create and publish my first post?"
+    ],
+    feedbackForm: {
+      label: "Tell us what's wrong",
+      placeholder: "e.g., Home page takes 10–20s to load on desktop",
+      submit: "Send feedback",
+      confirmation: "Thanks — we received your report and will investigate."
+    },
+  },
+  Dashboard: {
+    intro: "I am synced with your Dashboard context. I can help you understand stats, find actions fast, and troubleshoot loading issues in overview cards.",
+    suggestions: [
+      "Summarize my dashboard",
+      "What should I do next?",
+      "Dashboard widgets are not loading"
+    ],
+  },
+  "Profile Page": {
+    intro: "I can help with profile updates, photo upload, and account settings. I can also troubleshoot if profile details are missing or slow to appear.",
+    suggestions: [
+      "How do I update profile details?",
+      "Why profile photo is not updating?",
+      "Profile page is still loading"
+    ],
+  },
+  "Create Post Page": {
+    intro: "I can assist while you write: title ideas, metadata, structure, and publishing steps. If editor fields are not loading correctly, I can help diagnose that too.",
+    suggestions: [
+      "Generate a better title",
+      "Help me with SEO metadata",
+      "Editor is taking too long to load"
+    ],
+  },
+  "Edit Post Page": {
+    intro: "I can help improve your current draft while keeping your existing context. I can also assist if edit form content does not load as expected.",
+    suggestions: [
+      "Improve this draft",
+      "Suggest stronger keywords",
+      "My post data is not loading"
+    ],
+  },
+  "Posts Page": {
+    intro: "I can help you manage all posts, sorting, and cleanup decisions. If cards or list data are delayed, I can guide quick checks.",
+    suggestions: [
+      "How should I organize my posts?",
+      "Explain sorting options",
+      "Post list is not loading"
+    ],
+  },
+  "Public Posts Page": {
+    intro: "I can help review public posts and improve discoverability. If public content is not visible or delayed, I can help troubleshoot.",
+    suggestions: [
+      "How can I improve public reach?",
+      "Show public post best practices",
+      "Public posts not loading"
+    ],
+  },
+  "Public Feed Page": {
+    intro: "I can help you explore the public feed and identify useful content quickly. If feed items are not loading, I can suggest fast checks.",
+    suggestions: [
+      "How do I find quality posts quickly?",
+      "What can I do on this page?",
+      "Public feed loads slowly"
+    ],
+  },
+};
+
+function getPageHelp(page) {
+  return PAGE_HELP_CONFIG[page] || {
+    intro: `I can help on the ${page} page. Ask for navigation help, feature guidance, or loading issue support.`,
+    suggestions: [
+      "Explain this page",
+      "What can I do here?"
+    ],
+  };
+}
+
+function collectLivePageSnapshot() {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return null;
+  }
+
+  const getTextList = (selector, limit = 8) => {
+    return Array.from(document.querySelectorAll(selector))
+      .map((el) => (el?.textContent || "").trim())
+      .filter(Boolean)
+      .slice(0, limit);
+  };
+
+  const headingTexts = getTextList("h1, h2, h3", 10);
+  const actionTexts = getTextList("button, a[role='button'], a", 12);
+  const hasSpinner = Boolean(
+    document.querySelector(".animate-spin, [aria-busy='true'], [data-loading='true']")
+  );
+
+  return {
+    path: window.location.pathname,
+    fullUrl: window.location.href,
+    title: document.title || "",
+    headings: headingTexts,
+    visibleActions: actionTexts,
+    pageIsLikelyLoading: hasSpinner,
+    capturedAt: new Date().toISOString(),
+  };
+}
+
+export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard", pageContext = null, AICall }) {
   // Chat state
   const [isOpen, setIsOpen] = useState(fullPage);
   const [isVisible, setIsVisible] = useState(fullPage);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [typing, setTyping] = useState(false);
+  const [quickPrompts, setQuickPrompts] = useState([]);
 
   // Sidebar size
   const [sidebarWidth, setSidebarWidth] = useState(600);
@@ -24,6 +138,8 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
   const rightResizerRef = useRef(null);
   const topResizerRef = useRef(null);
   const shouldAutoScrollRef = useRef(true);
+  const lastPageRef = useRef(null);
+  const inputRef = useRef(null);
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
@@ -31,8 +147,9 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
   const userData = useSelector((s) => s.AuthSlice.userData);
 
   // Base data for AI
-  let Data = {
+  const baseData = {
     name: userData?.name || "User",
+    currentPageOnUser: page,
     totalPosts: {
       Drafts: userData?.prefs?.Drafts || 0,
       Private: userData?.prefs?.Private || 0,
@@ -41,6 +158,26 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
     postPerWeek: userData?.prefs?.Week || 0,
     navigationMenu: ["Home", "Profile", "Create Post", "My Post", "Public Post", "Logout"],
   };
+
+  useEffect(() => {
+    const pageHelp = getPageHelp(page);
+    setQuickPrompts(pageHelp.suggestions);
+
+    if (lastPageRef.current === page) return;
+    lastPageRef.current = page;
+
+    setTyping(false);
+    shouldAutoScrollRef.current = true;
+    setMessages([
+      {
+        type: "ai",
+        text: pageHelp.intro,
+        loading: false,
+        error: "",
+        meta: { kind: "page-intro", page },
+      },
+    ]);
+  }, [page]);
 
   // Auto scroll when open
   useEffect(() => {
@@ -142,19 +279,24 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
   // Add AI message
   const addAIMessage = async (userMessage) => {
     setTyping(true);
-    if (page === "Dashboard") {
-      Data = {
-        ...Data,
-        dashboardSummary: { welcomeMessage: `Welcome back, ${userData?.name || "Here is User Name"}` },
-        visibleSections: ["Top Navigation", "Dashboard Overview", "Post Statistics", "Quick Links", "Post Charts"],
-        quickLinks: ["New Post", "All Posts", "My Public Post", "My Private Post", "Drafts Post", "All Public Post"],
-        currentPageOnUser: "Dashboard",
-      };
-    } else {
-      const PageData = AICall();
-      Data = { ...Data, ...PageData };
-      console.log("This is The Page Data Come Form:", PageData);
-    }
+    const pageHelp = getPageHelp(page);
+    const resolvedPageContext = pageContext || (typeof AICall === "function" ? AICall() : null);
+    const livePageSnapshot = collectLivePageSnapshot();
+    const Data = {
+      ...baseData,
+      assistantMode: "page-aware-help-bot",
+      pageGoal: pageHelp.intro,
+      quickPrompts,
+      livePageSnapshot,
+      ...(page === "Dashboard"
+        ? {
+            dashboardSummary: { welcomeMessage: `Welcome back, ${userData?.name || "Here is User Name"}` },
+            visibleSections: ["Top Navigation", "Dashboard Overview", "Post Statistics", "Quick Links", "Post Charts"],
+            quickLinks: ["New Post", "All Posts", "My Public Post", "My Private Post", "Drafts Post", "All Public Post"],
+          }
+        : {}),
+      ...(resolvedPageContext || {}),
+    };
     console.log("This Is Data For LLm", Data);
     // Add placeholder AI message
     let messageIndex;
@@ -277,6 +419,8 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
                 </div>
               )}
 
+              
+
               {messages.map((msg, idx) => (
                 <div key={idx} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
                   {msg.type === "ai" ? (
@@ -322,9 +466,26 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
 
             {/* Footer */}
             <div className="p-4 border-t border-pink-50 dark:border-pink-900/30 bg-white/10 dark:bg-gray-950/30 backdrop-blur-sm">
+              {quickPrompts.length > 0 && (
+                <div className="mb-3 overflow-x-auto scrollbar-hidden">
+                  <div className="flex gap-2 whitespace-nowrap px-1">
+                    {quickPrompts.map((prompt, i) => (
+                      <button
+                        key={`suggest-${i}`}
+                        onClick={() => { setInput(prompt); inputRef.current && inputRef.current.focus(); }}
+                        className="inline-flex flex-shrink-0 text-xs px-3 py-1.5 rounded-full border border-pink-200 dark:border-pink-700 text-pink-600 dark:text-pink-200 hover:bg-pink-50 dark:hover:bg-pink-900/30 transition-colors"
+                      >
+                        {prompt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="relative flex items-center gap-2 bg-gray-50/30 dark:bg-pink-900/10 border border-pink-100 dark:border-pink-900/50 p-2 rounded-2xl focus-within:ring-2 ring-pink-500/20 transition-all">
                 <input
                   type="text"
+                  ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") { handleSend(); } }}
@@ -347,5 +508,3 @@ export default function AIAssistantSidebar({ fullPage = false, page = "Dashboard
     </div>
   );
 }
-
-

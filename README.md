@@ -179,6 +179,16 @@ This project is licensed under the **GNU General Public License v3.0**.
 
 ---
 
+## 🤖 Chatbot
+
+A conversational assistant integrated into the frontend to help with content creation and quick questions.
+
+- **Component:** [Web/src/Component/AIAssistant.jsx](Web/src/Component/AIAssistant.jsx#L1)
+- **Functions:** [Functions/ai-tools](Functions/ai-tools/README.md)
+- **Usage:** Run the frontend (`npm run dev`) and navigate to the page where the assistant appears (e.g., the dashboard or editor). The component connects to the AI utilities in `Functions/ai-tools` for chat and summarization features.
+
+---
+
 ## 🙏 Acknowledgments
 
 * Appwrite – Backend as a Service

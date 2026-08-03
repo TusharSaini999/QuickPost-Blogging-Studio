@@ -17,6 +17,8 @@ import Edit from './Pages/Edit.jsx';
 import Post from './Pages/Post.jsx';
 import PostView from './Pages/PostView.jsx';
 import PublicPosts from './Pages/GlobalPost.jsx'
+import { Navigate } from "react-router";
+import { AIPageContextProvider } from './Component/AIPageContext.jsx'
 
 let router = createBrowserRouter([
   {
@@ -97,7 +99,7 @@ let router = createBrowserRouter([
         ]
       },
       {
-        path: "publicPost",
+        path: "publicpost",
         children: [
           {
             path: "",
@@ -106,6 +108,10 @@ let router = createBrowserRouter([
           {
             path: "view/:id",
             Component: PostView
+          },
+          {
+            path: "*",
+            element: <Navigate to="/dashboard/publicpost" replace />
           },
         ]
       }
@@ -134,8 +140,10 @@ const ThemeProvider = ({ children }) => {
 
 createRoot(document.getElementById('root')).render(
   <Provider store={store}>
-    <ThemeProvider>
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <AIPageContextProvider>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </AIPageContextProvider>
   </Provider>
 );
