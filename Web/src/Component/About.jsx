@@ -16,17 +16,13 @@ const About = () => {
                 {/* Text Content */}
                 <div className="w-full md:w-1/2">
                     <h2 className="text-3xl font-bold mb-4 text-red-600 dark:text-red-400">
-                        About Quick Post
+                        About Quick Post Studio
                     </h2>
                     <p className="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
-                        <strong>Quick Post</strong> is a modern platform built for creators who want to share
-                        thoughts, insights, or stories effortlessly. Whether you're a writer crafting blogs,
-                        a developer showcasing your work, or just someone who loves sharing updates, Quick Post
-                        offers a clean, fast, and distraction-free space.
+                        <strong>Quick Post Studio</strong> is a modern blogging platform tailored for writers, developers, and creators who want to share their insights with the world. We provide a feature-rich, distraction-free environment that puts your content front and center.
                     </p>
                     <p className="text-gray-700 dark:text-gray-300 text-lg mt-4 leading-relaxed">
-                        With a focus on performance, simplicity, and responsive design, Quick Post makes content
-                        creation feel natural—on any device, at any time.
+                        From drafting your first post with the help of AI assistants to publishing and engaging with readers, Quick Post Studio is designed to make the entire blogging lifecycle intuitive and enjoyable. Create, manage, and scale your personal or professional blog with ease.
                     </p>
                 </div>
             </div>

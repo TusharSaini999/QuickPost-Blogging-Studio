@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Globe, Github, Activity } from "lucide-react";
 import databaseService from "../Appwrite/databases";
 import { useForm } from 'react-hook-form';
 const ContactUs = () => {
@@ -52,28 +52,39 @@ const ContactUs = () => {
 
 
                         <div className="flex items-start gap-4">
-                            <MapPin className="text-red-500 mt-1" size={24} />
+                            <Globe className="text-red-500 mt-1" size={24} />
                             <div>
-                                <h4 className="text-lg font-semibold text-gray-800 dark:text-white">Our Office</h4>
-                                <p className="text-gray-600 dark:text-gray-300">
-                                    123 QuickPost Street, Tech City, India
+                                <a href="https://quickpostai.tusharsaini.tech/" target="_blank" rel="noopener noreferrer">
+                                    <h4 className="text-lg font-semibold text-gray-800 dark:text-white hover:text-red-500 transition-colors inline-block">Official Website</h4>
+                                </a>
+                                <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
+                                    Visit the QuickPost homepage to explore features, create content, and access the latest updates.
                                 </p>
                             </div>
                         </div>
 
                         <div className="flex items-start gap-4">
-                            <Phone className="text-red-500 mt-1" size={24} />
+                            <Github className="text-red-500 mt-1" size={24} />
                             <div>
-                                <h4 className="text-lg font-semibold text-gray-800 dark:text-white">Phone</h4>
-                                <p className="text-gray-600 dark:text-gray-300">+91 9876543210</p>
+                                <a href="https://github.com/TusharSaini999/QuickPost-Blogging-Studio" target="_blank" rel="noopener noreferrer">
+                                    <h4 className="text-lg font-semibold text-gray-800 dark:text-white hover:text-red-500 transition-colors inline-block">GitHub Repository</h4>
+                                </a>
+                                <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
+                                    Browse the source code, report issues, contribute to development, and track project progress.
+                                </p>
                             </div>
                         </div>
 
                         <div className="flex items-start gap-4">
-                            <Mail className="text-red-500 mt-1" size={24} />
+                            <Activity className="text-green-500 mt-1" size={24} />
                             <div>
-                                <h4 className="text-lg font-semibold text-gray-800 dark:text-white">Email</h4>
-                                <p className="text-gray-600 dark:text-gray-300">support@quickpost.com</p>
+                                <h4 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+                                    System Status
+                                    <span className="text-xs font-bold px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400 rounded-full">All systems operational</span>
+                                </h4>
+                                <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
+                                    Check the current service status, uptime, scheduled maintenance, and any ongoing incidents.
+                                </p>
                             </div>
                         </div>
                     </div>

@@ -1,25 +1,25 @@
-import { Briefcase, Globe, Send, Shield } from "lucide-react";
+import { PenTool, Sparkles, BarChart, Send } from "lucide-react";
 
 const services = [
   {
-    title: "Fast Delivery",
-    description: "Get your posts delivered quickly and securely with our optimized system.",
+    title: "Content Creation",
+    description: "Write and format posts effortlessly with our intuitive, distraction-free rich text editor.",
+    icon: <PenTool size={32} className="text-red-500" />,
+  },
+  {
+    title: "AI Assistance",
+    description: "Overcome writer's block using our built-in AI tools for drafting and smart summaries.",
+    icon: <Sparkles size={32} className="text-red-500" />,
+  },
+  {
+    title: "Audience Insights",
+    description: "Track your blog's performance and understand your readers with comprehensive analytics.",
+    icon: <BarChart size={32} className="text-red-500" />,
+  },
+  {
+    title: "Seamless Publishing",
+    description: "Publish your thoughts instantly to the world, or save them securely as drafts.",
     icon: <Send size={32} className="text-red-500" />,
-  },
-  {
-    title: "Global Reach",
-    description: "Connect with users worldwide and grow your audience like never before.",
-    icon: <Globe size={32} className="text-red-500" />,
-  },
-  {
-    title: "Secure Platform",
-    description: "Your data is protected with top-notch security and encryption.",
-    icon: <Shield size={32} className="text-red-500" />,
-  },
-  {
-    title: "Professional Tools",
-    description: "Use smart tools for scheduling, analytics, and post optimization.",
-    icon: <Briefcase size={32} className="text-red-500" />,
   },
 ];
 

@@ -5,47 +5,47 @@ const Features = () => {
     <section className="bg-white dark:bg-gray-800 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-red-600 dark:text-red-400 mb-6">
-          Features of Quick Post
+          Features of Quick Post Studio
         </h2>
         <p className="text-gray-700 dark:text-gray-300 max-w-2xl mx-auto mb-12 text-base sm:text-lg">
           Discover the powerful tools that make{" "}
           <span className="text-red-600 dark:text-red-400 font-semibold">
-            Quick Post
+            Quick Post Studio
           </span>{" "}
-          a seamless and efficient platform for sharing ideas and staying connected.
+          the perfect platform for writing, sharing, and discovering great content.
         </p>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {[
             {
-              title: "Real-Time Posting",
+              title: "AI-Powered Assistant",
               description:
-                "Instantly publish your thoughts, photos, or updates and see them appear live across the platform.",
+                "Automatically generate article summaries and SEO metadata using our advanced built-in AI capabilities.",
             },
             {
-              title: "Smart Feed Algorithm",
+              title: "Global Post Feed",
               description:
-                "Our intelligent algorithm prioritizes relevant and trending posts, personalized for each user.",
+                "Discover fresh content and connect with other creators by browsing the public global feed.",
             },
             {
-              title: "Media Support",
+              title: "Secure Authentication",
               description:
-                "Easily share images, videos, and links with high-speed uploading and optimized previews.",
+                "Log in quickly and safely with OAuth support and reliable email verification powered by Appwrite.",
+            },
+            {
+              title: "Creator Dashboard",
+              description:
+                "Monitor your content and track your performance metrics from a clean, centralized dashboard.",
             },
             {
               title: "Dark Mode Ready",
               description:
-                "Enjoy a visually pleasing experience with full support for dark and light themes.",
+                "Write and read comfortably at any time of day with a fully integrated toggle for dark and light themes.",
             },
             {
-              title: "User Interaction",
+              title: "Profile Management",
               description:
-                "Like, comment, and follow — engage with a growing community in real-time.",
-            },
-            {
-              title: "Admin Control",
-              description:
-                "Secure moderation tools to manage posts, users, and reports from a central dashboard.",
+                "Customize your public persona, manage your published posts, and update your security settings with ease.",
             },
           ].map((feature, index) => (
             <div
