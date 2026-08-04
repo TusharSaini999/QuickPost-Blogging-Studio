@@ -27,6 +27,8 @@ const Home = () => {
       <Element name="Contact">
         <Contact />
       </Element>
+
+
     </main>
   );
 };

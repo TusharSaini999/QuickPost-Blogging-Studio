@@ -7,10 +7,10 @@ const Hero = () => (
       {/* Text Content */}
       <div className="w-full md:w-1/2 text-center md:text-left space-y-6">
         <h1 className="text-4xl sm:text-5xl font-extrabold text-red-700 dark:text-red-400 leading-tight">
-          Welcome to <span className="text-red-600 dark:text-red-300">Quick Post</span>
+          Welcome to <span className="text-red-600 dark:text-red-300">Quick Post Studio</span>
         </h1>
         <p className="text-base sm:text-lg text-gray-800 dark:text-gray-300">
-          Quick Post is the fastest and easiest way to share your ideas, thoughts, and updates with the world. Whether it's news, personal updates, or creative content — stay connected, stay heard.
+          Your ultimate blogging studio. Craft compelling stories, share your expertise, and build an audience with our sleek, distraction-free writing environment. Quick Post empowers creators to turn ideas into beautifully formatted blogs in seconds.
         </p>
         <div className="flex justify-center md:justify-start">
           <Link
