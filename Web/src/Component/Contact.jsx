@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Globe, Github, Activity } from "lucide-react";
+import { Globe, Mail, Github, Activity } from "lucide-react";
 import databaseService from "../Appwrite/databases";
 import { useForm } from 'react-hook-form';
 const ContactUs = () => {
@@ -59,6 +59,20 @@ const ContactUs = () => {
                                 </a>
                                 <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
                                     Visit the QuickPost homepage to explore features, create content, and access the latest updates.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-4">
+                            <Mail className="text-red-500 mt-1" size={24} />
+                            <div>
+                                <a href="mailto:support@quickpost.tusharsaini.tech">
+                                    <h4 className="text-lg font-semibold text-gray-800 dark:text-white hover:text-red-500 transition-colors inline-block">Support Email</h4>
+                                </a>
+                                <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
+                                    <a href="mailto:support@quickpost.tusharsaini.tech" className="text-red-600 dark:text-red-400 hover:underline">support@quickpost.tusharsaini.tech</a>
+                                    <br />
+                                    Reach out to us directly for help, questions, or feedback.
                                 </p>
                             </div>
                         </div>

@@ -199,6 +199,7 @@ A conversational assistant integrated into the frontend to help with content cre
 
 ---
 
-### 👨‍💻 Author
+### 👨‍💻 Author & Support
 
-**Tushar Saini**
+**Tushar Saini**  
+📧 **Support Email:** [support@quickpost.tusharsaini.tech](mailto:support@quickpost.tusharsaini.tech)
