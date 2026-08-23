@@ -77,9 +77,9 @@ Configure these variables in **Appwrite → Functions → Settings → Variables
 ```env
 SMTP_HOST=smtp.yourprovider.com
 SMTP_PORT=587
-SMTP_USER=support@quickpost.tusharsaini.tech
+SMTP_USER=support@quickpostai.tusharsaini.tech
 SMTP_PASS=your_email_password
-SMTP_FROM=support@quickpost.tusharsaini.tech
+SMTP_FROM=support@quickpostai.tusharsaini.tech
 ```
 
 ---

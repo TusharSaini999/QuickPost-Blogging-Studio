@@ -202,4 +202,4 @@ A conversational assistant integrated into the frontend to help with content cre
 ### 👨‍💻 Author & Support
 
 **Tushar Saini**  
-📧 **Support Email:** [support@quickpost.tusharsaini.tech](mailto:support@quickpost.tusharsaini.tech)
+📧 **Support Email:** [support@quickpostai.tusharsaini.tech](mailto:support@quickpostai.tusharsaini.tech)
