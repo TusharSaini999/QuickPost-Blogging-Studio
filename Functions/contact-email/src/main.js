@@ -9,22 +9,33 @@ export default async ({ req, res, log, error }) => {
 
     const { name, email } = data;
 
-    if (!email) {
-      throw new Error("Email field is missing");
-    }
+    const port = Number(process.env.SMTP_PORT) || 587;
 
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false,
+      port,
+      secure: process.env.SMTP_SECURE === 'true' || port === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
 
+    // Extract and sanitize SMTP_FROM address
+    const rawFrom = process.env.SMTP_FROM || process.env.SMTP_USER;
+    if (!rawFrom) {
+      throw new Error(
+        'Neither SMTP_FROM nor SMTP_USER environment variable is configured.'
+      );
+    }
+
+    const emailMatch = rawFrom.match(/<([^>]+)>/);
+    const cleanFrom = (emailMatch ? emailMatch[1] : rawFrom)
+      .replace(/["']/g, '')
+      .trim();
+
     await transporter.sendMail({
-      from: `"Quick Post 🚀" <${process.env.SMTP_USER}>`,
+      from: `"Quick Post" <${cleanFrom}>`,
       to: email,
       subject: "Thanks for contacting Quick Post 🚀",
       html: `
